@@ -180,14 +180,7 @@ export const projects = [
   },
 ];
 
-export const processSteps = [
-  { step: "01", title: "Consultation", description: "We study your bills, load pattern and goals to shortlist the right system size." },
-  { step: "02", title: "Site Survey", description: "Structural, shadow and electrical audit of your rooftop or ground area." },
-  { step: "03", title: "Design", description: "3D layout, string design, generation estimate and financial model shared for approval." },
-  { step: "04", title: "Installation", description: "Certified crews complete mounting, wiring and safety commissioning." },
-  { step: "05", title: "Inspection", description: "DISCOM inspection, net-meter installation and compliance documentation." },
-  { step: "06", title: "Activation", description: "Grid synchronisation, monitoring app handover and performance walkthrough." },
-];
+
 
 export const subsidySteps = [
   {
@@ -498,7 +491,7 @@ export const galleryImages = [
   { src: "/reference/WhatsApp Image 2026-08-12 at 1.14.57 AM.jpeg", alt: "Completed Home Rooftop Solar System", category: "Residential" },
 ];
 
-export const ecoIcon = Leaf;
+
 
 
 

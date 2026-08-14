@@ -8,14 +8,14 @@ import { CtaBanner } from "@/components/sections/CtaBanner";
 const CalculatorPage = () => (
   <Layout>
     <Seo
-      title="Solar Savings Calculator | Estimate Size, Cost & Subsidy | SSR Solar Power"
-      description="Estimate your recommended plant size, system cost and government subsidy with the SSR Solar Power calculator."
+      title="Solar Savings Calculator | Estimate Plant Size & Savings | SSR Solar Power"
+      description="Calculate your recommended rooftop solar plant size, monthly savings, annual savings and CO2 reduction with SSR Solar Power."
       path="/calculator"
     />
     <PageHero
       eyebrow="Solar Calculator"
       title="Estimate your savings in under a minute"
-      description="Enter your bill and consumption to see indicative sizing, project cost and subsidy for your rooftop."
+      description="Enter your bill, consumption and roof size to see recommended plant size, monthly & annual savings and carbon reduction for your rooftop."
       image="https://images.unsplash.com/photo-1545209463-e2825498edbf?w=1920&q=80"
     />
     <SolarCalculator />

@@ -24,7 +24,6 @@ import {
 
 import hybridSolarSystem from "@/assets/off-grid-solar-system.png";
 import hybridSolarInfographic from "@/assets/hybrid-solar-infographic.png";
-import { SolarQuoteForm } from "@/components/sections/SolarQuoteForm";
 
 export const HybridSolar = () => (
   <Layout>
@@ -39,7 +38,6 @@ export const HybridSolar = () => (
       title="Hybrid Solar Power Systems"
       description="The ultimate solar solution combining DISCOM net-metering grid connection for up to 90% electricity bill savings + intelligent battery storage for 24x7 uninterrupted power backup during grid outages."
       image={hybridSolarSystem}
-      rightContent={<SolarQuoteForm defaultSystemType="Hybrid" standalone={false} />}
     >
       <div className="flex flex-wrap gap-4">
         <Button asChild className="btn-premium rounded-full bg-gradient-brand px-7 font-semibold text-primary-foreground shadow-glow">

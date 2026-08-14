@@ -26,8 +26,6 @@ import {
 import onGridSolarSystem from "@/assets/on-grid-solar-system.png";
 import onGridSolarInfographic from "@/assets/on-grid-solar-infographic.png";
 
-import { SolarQuoteForm } from "@/components/sections/SolarQuoteForm";
-
 export const OnGridSolar = () => (
   <Layout>
     <Seo
@@ -41,7 +39,6 @@ export const OnGridSolar = () => (
       title="On-Grid Solar Power Systems"
       description="Maximise electricity bill savings with grid-tied rooftop solar technology. Feed excess generation back into the utility grid via bidirectional net metering and claim government subsidies up to ₹1,08,000."
       image={onGridSolarSystem}
-      rightContent={<SolarQuoteForm defaultSystemType="On-Grid" standalone={false} />}
     >
       <div className="flex flex-wrap gap-4">
         <Button asChild className="btn-premium rounded-full bg-gradient-brand px-7 font-semibold text-primary-foreground shadow-glow">
