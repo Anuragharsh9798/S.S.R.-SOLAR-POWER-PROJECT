@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSR Solar Power | Residential, Commercial &amp; Industrial Solar Solutions</title>
+    <meta
+      name="description"
+      content="SSR Solar Power designs and installs premium rooftop and industrial solar systems. Cut electricity bills up to 90% with subsidy assistance, EMI options and 25-year warranty."
+    />
+    <link rel="canonical" href="/" />
+    <meta name="author" content="SSR Solar Power" />
+
+    <meta property="og:title" content="SSR Solar Power | Premium Solar Energy Solutions" />
+    <meta
+      property="og:description"
+      content="Reduce your electricity bills by up to 90% with reliable residential, commercial and industrial solar solutions."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SSR Solar Power | Premium Solar Energy Solutions" />
+    <meta
+      name="twitter:description"
+      content="Reduce your electricity bills by up to 90% with reliable residential, commercial and industrial solar solutions."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "SSR Solar Power",
+        "description": "Premium residential, commercial and industrial solar energy solutions.",
+        "url": "/"
+      }
+    </script>
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem("ssr-theme");
+          var supportDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (stored === "dark" || (!stored && supportDark)) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+
+          var storedWeather = localStorage.getItem("ssr-weather");
+          if (storedWeather === "sunny" || storedWeather === "cloudy" || storedWeather === "rain") {
+            document.documentElement.setAttribute("data-weather", storedWeather);
+          } else {
+            document.documentElement.setAttribute("data-weather", "sunny");
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
