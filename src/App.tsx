@@ -15,8 +15,12 @@ import Projects from "./pages/Projects";
 import Gallery from "./pages/Gallery";
 import Subsidy from "./pages/Subsidy";
 import ReferAndEarn from "./pages/ReferAndEarn";
+import AdminReferrals from "./pages/AdminReferrals";
+import AdminDatabase from "./pages/AdminDatabase";
 import TestimonialsPage from "./pages/TestimonialsPage";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import Contact from "./pages/Contact";
 import Faq from "./pages/Faq";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
@@ -62,8 +66,12 @@ const AnimatedRoutes = () => {
           <Route path="/subsidy" element={<Subsidy />} />
           <Route path="/pm-surya-ghar-yojana" element={<Subsidy />} />
           <Route path="/refer-and-earn" element={<ReferAndEarn />} />
+          <Route path="/admin/referrals" element={<AdminReferrals />} />
+          <Route path="/admin/database" element={<AdminDatabase />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />

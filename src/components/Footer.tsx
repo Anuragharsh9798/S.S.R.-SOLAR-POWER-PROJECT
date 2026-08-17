@@ -11,7 +11,6 @@ import {
   Send,
   ShieldCheck,
   Sun,
-  Twitter,
   Youtube,
 } from "lucide-react";
 import { company, services, products } from "@/data/site";
@@ -30,17 +29,6 @@ const quickLinks = [
   { label: "FAQ", href: "/faq" },
 ];
 
-const XIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-  </svg>
-);
-
 const socials = [
   {
     icon: Facebook,
@@ -51,11 +39,6 @@ const socials = [
     icon: Instagram,
     label: "Instagram",
     color: "hover:text-pink-500 hover:border-pink-500/60 hover:bg-pink-500/10 hover:shadow-[0_0_22px_rgba(236,72,153,0.6)]",
-  },
-  {
-    icon: XIcon,
-    label: "X (Twitter)",
-    color: "hover:text-foreground hover:border-foreground/60 hover:bg-foreground/10 hover:shadow-[0_0_22px_rgba(148,163,184,0.6)]",
   },
   {
     icon: Linkedin,
@@ -85,13 +68,11 @@ export const Footer = () => (
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <Link to="/" className="group flex items-center gap-2.5">
-            <motion.span
-              animate={{ y: [0, -3, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="btn-premium flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-brand shadow-glow"
-            >
-              <Sun className="h-5 w-5 text-primary-foreground icon-anim" />
-            </motion.span>
+            <img
+              src="/logo-icon.png"
+              alt="SSR Solar Power Logo Icon"
+              className="h-10 w-10 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
+            />
             <span className="font-display text-lg font-bold">SSR Solar Power</span>
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">

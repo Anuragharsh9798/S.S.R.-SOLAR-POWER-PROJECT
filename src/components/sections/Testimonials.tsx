@@ -34,6 +34,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
+import { api } from "@/lib/api";
+
 interface TestimonialsProps {
   isHomePage?: boolean;
 }
@@ -43,27 +45,60 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Review Form Modal State (Google Maps Progressive Flow)
+  // Review Form Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     location: "Mau, Uttar Pradesh",
     rating: 0, // Unselected by default (0 stars)
     quote: "",
-    systemType: "", // On-Grid Solar | Hybrid Solar
-    installType: "", // Residential | Commercial
+    systemType: "",
+    installType: "",
     likedAspects: [] as string[],
-    performance: "", // Excellent | Good | Average | Needs Improvement
-    experience: "", // Very Satisfied | Satisfied | Neutral | Dissatisfied
+    performance: "",
+    experience: "",
     photos: [] as File[],
   });
 
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [moderationNotice, setModerationNotice] = useState<string | null>(null);
+
+  // Fetch approved reviews from backend API on mount
+  useEffect(() => {
+    const fetchApprovedReviews = async () => {
+      setLoadingReviews(true);
+      try {
+        const data = await api.get<any[]>("/api/v1/reviews");
+        if (Array.isArray(data) && data.length > 0) {
+          const approvedOnly = data
+            .filter((r) => r.isApproved === true || r.isApproved === undefined)
+            .map((r) => ({
+              name: r.name,
+              location: r.location || "Uttar Pradesh",
+              rating: r.rating || 5,
+              quote: r.quote || r.comment || "",
+            }));
+
+          if (approvedOnly.length > 0) {
+            setItems(approvedOnly);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch reviews from backend API, using fallback:", err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+
+    fetchApprovedReviews();
+  }, []);
 
   const total = items.length;
 
-  // Lock background page scroll when review modal is open and restore when closed
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
@@ -75,11 +110,10 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
     };
   }, [isModalOpen]);
 
-  // Auto Slide Interval (5 seconds) with Pause on Hover
   useEffect(() => {
     if (isPaused || isModalOpen) return;
     const t = setInterval(() => {
-      setIndex((i) => (i + 1) % total);
+      setIndex((i) => (i + 1) % Math.max(1, total));
     }, 5000);
     return () => clearInterval(t);
   }, [isPaused, isModalOpen, total]);
@@ -88,7 +122,6 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
     setIndex((i) => (i + dir + total) % total);
   };
 
-  // Helper to calculate relative offset distance for 3D stack positions
   const getCardOffset = (cardIdx: number, activeIdx: number, count: number) => {
     let diff = cardIdx - activeIdx;
     if (diff < -Math.floor(count / 2)) diff += count;
@@ -111,30 +144,61 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
     });
     setHoverRating(null);
     setSubmitSuccess(false);
+    setApiError(null);
+    setModerationNotice(null);
   };
 
-  // Form submission handler
-  const handleSubmitReview = (e: React.FormEvent) => {
+  // Form submission handler -> POST /api/v1/reviews
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.rating === 0) return;
-    if (!formData.name.trim() || !formData.quote.trim()) return;
 
-    const newReview: TestimonialItem = {
+    if (formData.rating === 0 || formData.rating < 1 || formData.rating > 5) {
+      toast.error("Please select a rating (1 to 5 stars) before submitting.");
+      return;
+    }
+
+    if (!formData.name.trim() || !formData.quote.trim()) {
+      toast.error("Please fill in your full name and review message.");
+      return;
+    }
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    setApiError(null);
+
+    const payload = {
       name: formData.name.trim(),
       location: formData.location.trim() || "Uttar Pradesh",
       rating: formData.rating,
       quote: formData.quote.trim(),
+      solarType: formData.systemType || undefined,
+      installType: formData.installType || undefined,
     };
 
-    setItems((prev) => [newReview, ...prev]);
-    setSubmitSuccess(true);
-    setIndex(0);
+    try {
+      const res = await api.post<any>("/api/v1/reviews", payload);
 
-    // Reset form after short delay
-    setTimeout(() => {
-      resetForm();
-      setIsModalOpen(false);
-    }, 2800);
+      setSubmitSuccess(true);
+      const notice =
+        res?.message ||
+        "Thank you! Your review has been submitted successfully and is pending administrator moderation before display.";
+      setModerationNotice(notice);
+      toast.success("Review submitted for moderation!", {
+        description: "Our admin team will review and approve your submission shortly.",
+      });
+
+      setTimeout(() => {
+        resetForm();
+        setIsModalOpen(false);
+      }, 3200);
+    } catch (err: any) {
+      console.error("Submit review API error:", err);
+      const errMsg = err.message || "Failed to submit review. Please try again.";
+      setApiError(errMsg);
+      toast.error(errMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -725,12 +789,28 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                       </div>
                     </div>
 
-                    {/* Prominent Submit Button (Only visible after rating selected) */}
+                    {apiError && (
+                      <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 mt-2">
+                        <AlertCircle className="h-4 w-4 shrink-0" />
+                        <span>{apiError}</span>
+                      </div>
+                    )}
+
+                    {/* Prominent Submit Button */}
                     <Button
                       type="submit"
-                      className="w-full rounded-xl bg-gradient-brand py-3 h-12 text-sm font-bold text-primary-foreground shadow-glow flex items-center justify-center gap-2 mt-4"
+                      disabled={isSubmitting}
+                      className="w-full rounded-xl bg-gradient-brand py-3 h-12 text-sm font-bold text-primary-foreground shadow-glow flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50"
                     >
-                      <Send className="h-4 w-4" /> Submit Review for Verification
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Submitting for Moderation...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4" /> Submit Review for Verification
+                        </>
+                      )}
                     </Button>
                   </motion.div>
                 )}

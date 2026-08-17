@@ -172,7 +172,7 @@ export const SubsidyTimeline = () => (
   <MotionSection animation="fadeLeft" className="section bg-gradient-soft">
     <div className="container-wide">
       <SectionHeading
-        eyebrow="Central & State Government Subsidy"
+        eyebrow="Government Subsidy"
         title={<>Claim up to <span className="text-gradient-sun">₹1,08,000</span> in rooftop subsidy</>}
         description="We manage the entire national portal journey so your claim is approved without back-and-forth."
       />

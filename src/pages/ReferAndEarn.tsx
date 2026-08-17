@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 import {
   ArrowRight,
   Award,
@@ -30,6 +31,7 @@ import {
   Trophy,
   Users,
   Zap,
+  AlertCircle,
 } from "lucide-react";
 
 export const ReferAndEarn = () => {
@@ -41,19 +43,57 @@ export const ReferAndEarn = () => {
     friendCity: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [claimData, setClaimData] = useState<{
+    claimNumber: string;
+    status: string;
+  } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-      toast.success("Referral Submitted Successfully!", {
-        description: "Our solar consultant will connect with your friend. You'll receive ₹5,000 upon installation!",
+    try {
+      const response = await api.post<any>("/api/v1/referrals", {
+        referrerName: formData.yourName,
+        referrerPhone: formData.yourMobile,
+        friendName: formData.friendName,
+        friendPhone: formData.friendMobile,
+        friendCity: formData.friendCity,
       });
-    }, 1200);
+
+      if (response && response.claimNumber) {
+        setClaimData({
+          claimNumber: response.claimNumber,
+          status: response.status || "PENDING",
+        });
+        toast.success("Referral Submitted Successfully!", {
+          description: `Claim #${response.claimNumber} registered. Pending admin verification.`,
+        });
+      }
+    } catch (err: any) {
+      console.error("Failed to submit referral:", err);
+      const errMsg = err.message || "Failed to submit referral claim. Please try again.";
+      setError(errMsg);
+      toast.error("Referral Submission Failed", {
+        description: errMsg,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setClaimData(null);
+    setError(null);
+    setFormData({
+      yourName: "",
+      yourMobile: "",
+      friendName: "",
+      friendMobile: "",
+      friendCity: "",
+    });
   };
 
   const handleWhatsAppShare = () => {
@@ -126,17 +166,25 @@ export const ReferAndEarn = () => {
                     </p>
                   </div>
 
-                  {submitted ? (
+                  {claimData ? (
                     <div className="py-8 text-center space-y-4">
                       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
                         <CheckCircle2 className="h-8 w-8" />
                       </div>
-                      <h4 className="text-xl font-bold text-foreground">Referral Received!</h4>
-                      <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                        Thank you for referring your friend! Our team will get in touch with them promptly.
+                      <div className="space-y-1.5">
+                        <span className="inline-block rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-extrabold text-amber-500 uppercase tracking-wider">
+                          Status: {claimData.status}
+                        </span>
+                        <h4 className="text-xl font-bold text-foreground pt-1">Referral Received!</h4>
+                        <div className="mx-auto inline-block rounded-xl border border-border bg-muted/60 px-4 py-2 font-mono text-sm font-bold text-primary">
+                          Claim Number: {claimData.claimNumber}
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                        Referral submitted successfully. Your claim is pending admin verification.
                       </p>
                       <Button
-                        onClick={() => setSubmitted(false)}
+                        onClick={resetForm}
                         variant="outline"
                         className="rounded-full px-6 font-semibold"
                       >
@@ -145,6 +193,13 @@ export const ReferAndEarn = () => {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
+                      {error && (
+                        <div className="flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+                          <AlertCircle className="h-4 w-4 shrink-0" />
+                          <span>{error}</span>
+                        </div>
+                      )}
+
                       <div className="space-y-1">
                         <Label htmlFor="yourName" className="text-xs font-semibold text-foreground">
                           Your Name *
@@ -238,51 +293,6 @@ export const ReferAndEarn = () => {
           </div>
         </div>
       </section>
-
-      {/* 2. TOGETHER WE'RE HELPING INDIA GO SOLAR (ENVIRONMENTAL IMPACT) */}
-      <MotionSection animation="fadeUp" className="section bg-gradient-soft">
-        <div className="container-wide">
-          <SectionHeading
-            eyebrow="Collective Impact"
-            title={<>Together, We're Helping <span className="text-gradient">India Go Solar</span></>}
-            description="Every successful referral accelerates clean energy adoption across the nation."
-          />
-
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="stat-card-gradient-border relative flex flex-col items-center justify-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                <span className="text-3xl">🌲</span>
-                <p className="text-3xl font-extrabold text-emerald-600">20,000+</p>
-                <p className="text-xs font-medium text-muted-foreground">Trees Saved Equivalent</p>
-              </div>
-            </div>
-
-            <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="stat-card-gradient-border relative flex flex-col items-center justify-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                <span className="text-3xl">☀️</span>
-                <p className="text-3xl font-extrabold text-amber-500">20+ MWp</p>
-                <p className="text-xs font-medium text-muted-foreground">Clean Solar Installed</p>
-              </div>
-            </div>
-
-            <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="stat-card-gradient-border relative flex flex-col items-center justify-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                <span className="text-3xl">🧾</span>
-                <p className="text-3xl font-extrabold text-primary">₹3+ Cr</p>
-                <p className="text-xs font-medium text-muted-foreground">Electricity Bills Reduced</p>
-              </div>
-            </div>
-
-            <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="stat-card-gradient-border relative flex flex-col items-center justify-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                <span className="text-3xl">⚡</span>
-                <p className="text-3xl font-extrabold text-sky-500">2.6 Tonnes</p>
-                <p className="text-xs font-medium text-muted-foreground">CO₂ Emissions Avoided</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </MotionSection>
 
       {/* 3. REFERRAL PROGRAM FAQS */}
       <MotionSection animation="fadeUp" className="section">

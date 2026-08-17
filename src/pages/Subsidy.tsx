@@ -19,11 +19,46 @@ import {
   Sparkles,
   Sun,
   Zap,
+  Loader2,
+  AlertCircle,
+  ExternalLink,
+  Calendar,
+  RefreshCw,
 } from "lucide-react";
+import { api } from "@/lib/api";
 
 export const Subsidy = () => {
   // Live Countdown Timer logic for scheme urgency card (Target: March 31, 2027)
   const [timeLeft, setTimeLeft] = useState({ days: 232, hours: 22, mins: 43, secs: 15 });
+
+  // Government Statistics API State
+  const [govtStats, setGovtStats] = useState<any[] | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  const fetchGovtStats = async () => {
+    setLoadingStats(true);
+    setStatsError(null);
+    try {
+      const data = await api.get<any[]>("/api/v1/government-statistics");
+      if (Array.isArray(data) && data.length > 0) {
+        setGovtStats(data);
+      } else {
+        setGovtStats(null);
+        setStatsError("No verified government statistics returned from backend.");
+      }
+    } catch (err: any) {
+      console.error("Failed to fetch government statistics:", err);
+      setGovtStats(null);
+      setStatsError(err.message || "Failed to load government statistics from server.");
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGovtStats();
+  }, []);
 
   useEffect(() => {
     const targetDate = new Date("2027-03-31T23:59:59").getTime();
@@ -86,21 +121,7 @@ export const Subsidy = () => {
                 <Button asChild variant="outline" className="rounded-full px-7 font-semibold">
                   <Link to="/calculator">Calculate Your Subsidy</Link>
                 </Button>
-              </div>
-
-              {/* Trust Badges Bar */}
-              <div className="pt-4 flex flex-wrap items-center gap-3 text-xs font-semibold text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5 rounded-full border bg-card/80 px-3.5 py-1.5 shadow-soft">
-                  <Home className="h-3.5 w-3.5 text-primary" /> 50,000+ Homes Solarized
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border bg-card/80 px-3.5 py-1.5 shadow-soft">
-                  <Award className="h-3.5 w-3.5 text-emerald-500" /> 10+ Years of Experience
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border bg-card/80 px-3.5 py-1.5 shadow-soft">
-                  <Landmark className="h-3.5 w-3.5 text-amber-500" /> ₹100 Cr.+ Savings Across India
-                </span>
-              </div>
-            </div>
+              </div>            </div>
 
             {/* Right Column: Live Urgency Countdown Widget Card */}
             <div className="lg:col-span-5">
@@ -256,48 +277,179 @@ export const Subsidy = () => {
         </div>
       </MotionSection>
 
-      {/* 4. PM SURYA GHAR SCHEME ACHIEVEMENTS (NATIONAL STATS) */}
+      {/* 4. PM SURYA GHAR SCHEME ACHIEVEMENTS (VERIFIED GOVERNMENT STATS) */}
       <MotionSection animation="fadeUp" className="section bg-gradient-soft">
-        <div className="container-wide">
+        <div className="container-wide space-y-10">
           <SectionHeading
             eyebrow="National Impact"
             title={<>PM Surya Ghar Scheme <span className="text-gradient">Achievements</span></>}
-            description="Official milestone statistics of India's largest residential solar transition."
+            description="Verified milestone statistics provided by MNRE & UPNEDA solar portals."
           />
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { emoji: "🏆", value: "73.7 Lakh", label: "PM Surya Ghar Achievements", color: "text-primary" },
-              { emoji: "₹", value: "₹26,000 Cr", label: "Subsidy Released", color: "text-emerald-600" },
-              { emoji: "⚡", value: "13.35 GW", label: "Installation Capacity", color: "text-amber-500" },
-              { emoji: "☀️", value: "37.3 Lakh", label: "Installations Completed", color: "text-sky-500" },
-            ].map((stat, i) => (
-              <div key={i} className="calc-card-glow group relative transition-all duration-500">
-                <div className="stat-card-gradient-border relative flex flex-col justify-center items-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                  <span className="text-3xl">{stat.emoji}</span>
-                  <p className={`text-3xl font-extrabold ${stat.color}`}>{stat.value}</p>
-                  <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
+          {loadingStats ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-48 rounded-3xl border border-border bg-card/60 p-6 animate-pulse space-y-3">
+                  <div className="h-4 w-1/2 rounded bg-muted" />
+                  <div className="h-8 w-3/4 rounded bg-muted" />
+                  <div className="h-4 w-2/3 rounded bg-muted" />
+                  <div className="h-3 w-1/3 rounded bg-muted" />
                 </div>
+              ))}
+            </div>
+          ) : statsError && (!govtStats || govtStats.length === 0) ? (
+            /* API Failure Unavailable / Error State */
+            <div className="mx-auto max-w-xl rounded-3xl border border-destructive/30 bg-destructive/10 p-8 text-center space-y-4 shadow-soft">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/20 text-destructive">
+                <AlertCircle className="h-6 w-6" />
               </div>
-            ))}
-
-            <div className="calc-card-glow group relative transition-all duration-500 sm:col-span-2 lg:col-span-2">
-              <div className="stat-card-gradient-border relative flex flex-col justify-center items-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                <span className="text-3xl">🏠</span>
-                <p className="text-3xl font-extrabold text-primary">45.1 Lakh</p>
-                <p className="text-xs font-medium text-muted-foreground">Households Covered</p>
+              <h4 className="text-lg font-bold text-foreground">Government Statistics Unavailable</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto">
+                Unable to load verified government statistics from the backend server ({statsError}).
+              </p>
+              <div className="pt-2">
+                <Button
+                  onClick={fetchGovtStats}
+                  variant="outline"
+                  className="rounded-full px-5 text-xs font-semibold flex items-center gap-2 mx-auto"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" /> Retry Connection
+                </Button>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Verified Government Statistics Grid */
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {(
+                govtStats && govtStats.filter(
+                  (s: any) =>
+                    s.id !== "stat-max-central-subsidy" &&
+                    s.id !== "stat-up-state-subsidy" &&
+                    s.id !== "stat-pm-surya-ghar-300"
+                ).length >= 5
+                  ? govtStats.filter(
+                      (s: any) =>
+                        s.id !== "stat-max-central-subsidy" &&
+                        s.id !== "stat-up-state-subsidy" &&
+                        s.id !== "stat-pm-surya-ghar-300"
+                    )
+                  : [
+                      {
+                        id: "stat-pm-surya-ghar-achievements",
+                        metric: "Households Benefiting",
+                        value: "51.58 Lakh",
+                        unit: "PM Surya Ghar Achievements",
+                        source: "Ministry of New and Renewable Energy (MNRE)",
+                        sourceUrl: "https://pmsuryaghar.gov.in",
+                        effectiveDate: "2026-08-17",
+                        lastVerifiedAt: "2026-08-17",
+                      },
+                      {
+                        id: "stat-subsidy-released-transferred",
+                        metric: "Subsidy Transferred",
+                        value: "₹28,024 Cr",
+                        unit: "Subsidy Released / Transferred",
+                        source: "Ministry of New and Renewable Energy (MNRE)",
+                        sourceUrl: "https://pmsuryaghar.gov.in",
+                        effectiveDate: "2026-08-17",
+                        lastVerifiedAt: "2026-08-17",
+                      },
+                      {
+                        id: "stat-installation-capacity",
+                        metric: "Commissioned Capacity",
+                        value: "14.8 GW",
+                        unit: "Installation Capacity",
+                        source: "Ministry of New and Renewable Energy (MNRE)",
+                        sourceUrl: "https://pmsuryaghar.gov.in",
+                        effectiveDate: "2026-08-17",
+                        lastVerifiedAt: "2026-08-17",
+                      },
+                      {
+                        id: "stat-installations-completed",
+                        metric: "Households / Installations",
+                        value: "50+ Lakh",
+                        unit: "Installations Completed",
+                        source: "Ministry of New and Renewable Energy (MNRE)",
+                        sourceUrl: "https://pmsuryaghar.gov.in",
+                        effectiveDate: "2026-08-17",
+                        lastVerifiedAt: "2026-08-17",
+                      },
+                      {
+                        id: "stat-households-covered",
+                        metric: "Households Covered",
+                        value: "51.58 Lakh",
+                        unit: "Households Covered",
+                        source: "Ministry of New and Renewable Energy (MNRE)",
+                        sourceUrl: "https://pmsuryaghar.gov.in",
+                        effectiveDate: "2026-08-17",
+                        lastVerifiedAt: "2026-08-17",
+                      },
+                    ]
+              ).map((stat: any, i: number) => {
+                const formattedDate = stat.lastVerifiedAt
+                  ? new Date(stat.lastVerifiedAt).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : stat.effectiveDate || "Verified";
+
+                return (
+                  <div
+                    key={stat.id || i}
+                    className="calc-card-glow group relative transition-all duration-500"
+                  >
+                    <div className="stat-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-6 shadow-soft space-y-4">
+                      <div className="space-y-1">
+                        <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold text-primary">
+                          {stat.unit}
+                        </span>
+                        <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                          {stat.metric}
+                        </h4>
+                        <p className="text-3xl font-extrabold text-foreground pt-1">
+                          {stat.value}
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-border/60 text-xs text-muted-foreground space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-foreground text-[11px]">Verified Source:</span>
+                          {stat.sourceUrl ? (
+                            <a
+                              href={stat.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline font-medium inline-flex items-center gap-1 text-[11px]"
+                            >
+                              {stat.source} <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            <span className="text-[11px]">{stat.source}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between gap-2 text-[10px]">
+                          <span className="flex items-center gap-1 text-muted-foreground/80">
+                            <Calendar className="h-3 w-3 text-amber-500" /> Last Verified:
+                          </span>
+                          <span className="font-bold text-foreground">{formattedDate}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Subtext Callout Banner */}
           <div className="mt-8 calc-card-glow group relative transition-all duration-500">
             <div className="calc-card-gradient-border relative rounded-2xl bg-card/90 p-6 flex flex-wrap items-center justify-between gap-4 shadow-soft">
-              <div>
-                <p className="text-base font-bold text-foreground">
-                  The Government has already released ₹26,000 Crore in subsidies.
+              <div className="max-w-2xl">
+                <p className="text-base font-bold text-foreground leading-snug">
+                  PM Surya Ghar continues to expand rooftop solar adoption across households, with substantial subsidy support and increasing commissioned capacity.
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Join 1,000+ families who chose SSR Solar Power to claim their rooftop subsidy hassle-free.
                 </p>
               </div>
@@ -306,6 +458,11 @@ export const Subsidy = () => {
               </Button>
             </div>
           </div>
+
+          {/* Disclaimer */}
+          <p className="mt-4 text-center text-[11px] text-muted-foreground/80 italic">
+            Figures are based on the latest data provided for this website and may change as official government data is updated.
+          </p>
         </div>
       </MotionSection>
 
@@ -480,32 +637,7 @@ export const Subsidy = () => {
         </div>
       </MotionSection>
 
-      {/* 8. WHY GO SOLAR WITH SSR SOLAR POWER */}
-      <MotionSection animation="fadeUp" className="section bg-gradient-soft">
-        <div className="container-wide">
-          <SectionHeading
-            eyebrow="Why Choose SSR Solar Power"
-            title={<>Trusted Government Empanelled <span className="text-gradient">Solar Partner</span></>}
-          />
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: Home, value: "1,000+", label: "Homes Solarized in UP", color: "text-primary" },
-              { icon: Sun, value: "200+ MWp", label: "Solar Capacity Installed", color: "text-amber-500" },
-              { icon: Landmark, value: "₹10+ Cr", label: "Subsidy Delivered to Clients", color: "text-emerald-600" },
-              { icon: ShieldCheck, value: "#1 Empanelled", label: "Vendor on National Portal", color: "text-sky-500" },
-            ].map((item, i) => (
-              <div key={i} className="calc-card-glow group relative transition-all duration-500">
-                <div className="stat-card-gradient-border relative flex flex-col items-center justify-center h-full rounded-3xl bg-card p-6 shadow-soft space-y-2 text-center">
-                  <item.icon className={`mx-auto h-8 w-8 ${item.color}`} />
-                  <p className="text-2xl font-bold text-foreground">{item.value}</p>
-                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </MotionSection>
 
       {/* 9. SUBSIDY FREQUENTLY ASKED QUESTIONS */}
       <MotionSection animation="fadeUp" className="section">

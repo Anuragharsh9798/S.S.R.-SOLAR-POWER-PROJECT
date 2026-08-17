@@ -1,0 +1,325 @@
+// Prisma Schema for SSR Solar Power Backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  phone        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  isActive     Boolean  @default(true) @map("is_active")
+  roleId       String   @map("role_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  role          Role        @relation(fields: [roleId], references: [id])
+  customer      Customer?
+  assignedLeads Quotation[] @relation("AssignedLeads")
+  auditLogs     AuditLog[]
+
+  @@index([email])
+  @@index([phone])
+  @@map("users")
+}
+
+model Customer {
+  id                  String   @id @default(uuid())
+  userId              String?  @unique @map("user_id")
+  fullName            String   @map("full_name")
+  phone               String   @map("phone")
+  email               String?
+  address             String?
+  houseNumber         String?  @map("house_number")
+  area                String?
+  city                String?
+  district            String?
+  state               String?
+  pincode             String?
+  latitude            Float?
+  longitude           Float?
+  discomConsumerNo    String?  @map("discom_consumer_no")
+  nationalPortalRegNo String?  @map("national_portal_reg_no")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  user              User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  quotations        Quotation[]
+  reviews           Review[]
+  chatConversations ChatConversation[]
+
+  @@index([phone])
+  @@index([city])
+  @@map("customers")
+}
+
+model Quotation {
+  id                      String   @id @default(uuid())
+  quoteNumber             String   @unique @map("quote_number")
+  customerId              String?  @map("customer_id")
+  fullName                String   @map("full_name")
+  phone                   String
+  email                   String?
+  address                 String
+  houseNumber             String?  @map("house_number")
+  area                    String?
+  city                    String
+  district                String?
+  state                   String   @default("Uttar Pradesh")
+  pincode                 String?
+  latitude                Float?
+  longitude               Float?
+  accuracy                String?
+  googleMapsUrl           String?  @map("google_maps_url")
+  monthlyBillAmount       Decimal? @map("monthly_bill_amount") @db.Decimal(10, 2)
+  monthlyUnits            Float?   @map("monthly_units")
+  electricityRate         Decimal? @map("electricity_rate") @db.Decimal(5, 2)
+  solarType               String   @default("On-Grid") @map("solar_type")
+  recommendedCapacityKw   Float?   @map("recommended_capacity_kw")
+  estimatedGrossCost      Decimal? @map("estimated_gross_cost") @db.Decimal(10, 2)
+  estimatedCentralSubsidy Decimal? @map("estimated_central_subsidy") @db.Decimal(10, 2)
+  estimatedStateSubsidy   Decimal? @map("estimated_state_subsidy") @db.Decimal(10, 2)
+  estimatedNetCost        Decimal? @map("estimated_net_cost") @db.Decimal(10, 2)
+  estimatedAnnualSavings  Decimal? @map("estimated_annual_savings") @db.Decimal(10, 2)
+  contactTime             String?  @map("contact_time")
+  status                  String   @default("NEW")
+  assignedToId            String?  @map("assigned_to_id")
+  message                 String?
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  assignedTo User?     @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([phone])
+  @@index([createdAt])
+  @@map("quotations")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  fullName  String   @map("full_name")
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt])
+  @@index([isRead])
+  @@map("contact_messages")
+}
+
+model Project {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  type          String   // Residential, Commercial, Industrial
+  location      String   // e.g. "Mau, Uttar Pradesh"
+  capacity      String   // e.g. "10 kW"
+  capacityKw    Float?   @map("capacity_kw")
+  completedDate String?  @map("completed_date")
+  annualSavings String?  @map("annual_savings")
+  rating        Int      @default(5)
+  description   String?
+  featuredImage String?  @map("featured_image")
+  isFeatured    Boolean  @default(false) @map("is_featured")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  images ProjectImage[]
+
+  @@index([slug])
+  @@index([type])
+  @@index([isFeatured])
+  @@map("projects")
+}
+
+model ProjectImage {
+  id           String   @id @default(uuid())
+  projectId    String   @map("project_id")
+  imageUrl     String   @map("image_url")
+  caption      String?
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_images")
+}
+
+model Review {
+  id           String   @id @default(uuid())
+  customerId   String?  @map("customer_id")
+  name         String
+  location     String
+  rating       Int      @default(5)
+  systemSizeKw Float?   @map("system_size_kw")
+  solarType    String?  @map("solar_type")
+  quote        String
+  isVerified   Boolean  @default(false) @map("is_verified")
+  isApproved   Boolean  @default(false) @map("is_approved")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([isApproved])
+  @@index([rating])
+  @@map("reviews")
+}
+
+model BlogCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  blogs Blog[]
+
+  @@map("blog_categories")
+}
+
+model Blog {
+  id            String    @id @default(uuid())
+  title         String
+  slug          String    @unique
+  excerpt       String
+  content       String    @db.Text
+  readTime      String    @map("read_time")
+  featuredImage String?   @map("featured_image")
+  categoryId    String?   @map("category_id")
+  publishedAt   DateTime? @map("published_at")
+  isPublished   Boolean   @default(true) @map("is_published")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  category BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isPublished])
+  @@map("blogs")
+}
+
+model GovernmentStatistic {
+  id             String    @id @default(uuid())
+  metric         String    @unique
+  value          String
+  unit           String
+  source         String
+  sourceUrl      String?   @map("source_url")
+  effectiveDate  DateTime? @map("effective_date")
+  lastVerifiedAt DateTime? @map("last_verified_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("government_statistics")
+}
+
+model ChatConversation {
+  id         String   @id @default(uuid())
+  sessionId  String   @unique @map("session_id")
+  customerId String?  @map("customer_id")
+  status     String   @default("ACTIVE")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  customer Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  messages ChatMessage[]
+
+  @@index([sessionId])
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  senderType     String   @map("sender_type") // USER, BOT, AGENT
+  message        String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("chat_messages")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorId     String?  @map("actor_id")
+  userEmail   String?  @map("user_email")
+  action      String   // CREATE, UPDATE, DELETE, LOGIN, EXPORT
+  entityName  String   @map("entity_name")
+  entityId    String?  @map("entity_id")
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  changesJson String?  @map("changes_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([entityName])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum ReferralStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Referral {
+  id              String         @id @default(uuid())
+  claimNumber     String         @unique @map("claim_number")
+  referrerName    String         @map("referrer_name")
+  referrerPhone   String         @map("referrer_phone")
+  friendName      String         @map("friend_name")
+  friendPhone     String         @map("friend_phone")
+  friendCity      String         @map("friend_city")
+  rewardAmount    Decimal?       @map("reward_amount") @db.Decimal(10, 2)
+  status          ReferralStatus @default(PENDING)
+  adminNotes      String?        @map("admin_notes")
+  reviewedBy      String?        @map("reviewed_by")
+  reviewedAt      DateTime?      @map("reviewed_at")
+  rejectionReason String?        @map("rejection_reason")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  @@index([claimNumber])
+  @@index([referrerPhone])
+  @@index([friendPhone])
+  @@index([status])
+  @@index([createdAt])
+  @@map("referrals")
+}
+

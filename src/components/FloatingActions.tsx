@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUp, Mail, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { company } from "@/data/site";
+import { SolarChatbot } from "./SolarChatbot";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg
@@ -57,6 +58,8 @@ export const FloatingActions = () => {
 
   return (
     <div className="fixed bottom-6 right-5 z-50 flex flex-col items-center gap-3.5 select-none">
+      {/* Solar AI Assistant Chatbot Button & Modal */}
+      <SolarChatbot />
       {floatingButtons.map(({ id, label, href, target, rel, icon: Icon, bgClass, pulseClass, floatDelay }) => (
         <motion.a
           key={id}

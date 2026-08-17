@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, Send, MapPin, CheckCircle2, Lock } from "lucide-react";
+import { Loader2, Send, MapPin, CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MotionSection } from "@/components/motion";
+import { fetchReverseGeocode } from "@/lib/reverseGeocode";
+import { api } from "@/lib/api";
 
 interface SolarQuoteFormProps {
   defaultSystemType?: "On-Grid" | "Hybrid";
@@ -15,7 +17,15 @@ interface SolarQuoteFormProps {
   standalone?: boolean;
 }
 
-type LocationStatus = "idle" | "detecting" | "success" | "denied" | "error";
+type LocationStatus = "idle" | "detecting" | "fetching_address" | "success" | "denied" | "error";
+
+interface GpsLocationData {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: string;
+  googleMapsUrl: string;
+}
 
 export const SolarQuoteForm = ({
   defaultSystemType,
@@ -23,19 +33,27 @@ export const SolarQuoteForm = ({
   standalone = true,
 }: SolarQuoteFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<LocationStatus>("idle");
-  const [locationVerified, setLocationVerified] = useState(false);
-  const [locationMessage, setLocationMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [quoteResponse, setQuoteResponse] = useState<any>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>("idle");
+  const [locationMessage, setLocationMessage] = useState("");
+  const [gpsLocation, setGpsLocation] = useState<GpsLocationData | null>(null);
 
   const initialSystemType = defaultSystemType || "On-Grid";
-  const shouldLock = lockSystemType !== undefined ? lockSystemType : defaultSystemType !== undefined;
 
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
     email: "",
     address: "",
+    houseNumber: "",
+    area: "",
+    city: "",
+    district: "",
+    state: "",
+    pin: "",
     bill: "",
     units: "",
     rate: "",
@@ -45,106 +63,154 @@ export const SolarQuoteForm = ({
   });
 
   const handleDetectLocation = () => {
+    if (locationStatus === "detecting" || locationStatus === "fetching_address") return;
+
     if (!navigator.geolocation) {
       setLocationStatus("error");
-      setLocationVerified(false);
-      setLocationMessage("Geolocation is not supported by your browser. Location access is required.");
+      setLocationMessage("Geolocation is not supported by your browser.");
       toast.error("Geolocation is not supported by your browser.");
       return;
     }
 
     setLocationStatus("detecting");
-    setLocationVerified(false);
-    setLocationMessage("Detecting your location...");
+    setLocationMessage("📍 Detecting your current location...");
+    setGpsLocation(null);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
+        const roundAccuracy = Math.round(accuracy);
+        const timestamp = new Date().toLocaleString("en-IN", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+
+        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+        if (accuracy > 300) {
+          setLocationStatus("error");
+          setLocationMessage("Your current location accuracy is low. Please enable Precise Location and try again.");
+          toast.error("Low GPS accuracy. Please enable Precise Location.");
+          return;
+        }
+
+        const locData: GpsLocationData = {
+          latitude,
+          longitude,
+          accuracy: roundAccuracy,
+          timestamp,
+          googleMapsUrl: mapsUrl,
+        };
+
+        setGpsLocation(locData);
+
+        setLocationStatus("fetching_address");
+        setLocationMessage("🔄 Fetching your address...");
+
         try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
-          );
-          if (response.ok) {
-            const data = await response.json();
-            if (data && data.display_name) {
-              setFormData((prev) => ({ ...prev, address: data.display_name }));
-              setLocationStatus("success");
-              setLocationVerified(true);
-              setLocationMessage("");
-              toast.success("Location detected & address populated!");
-            } else {
-              const fallback = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-              setFormData((prev) => ({ ...prev, address: fallback }));
-              setLocationStatus("success");
-              setLocationVerified(true);
-              setLocationMessage("");
-              toast.success("Location coordinates detected!");
-            }
-          } else {
-            const fallback = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-            setFormData((prev) => ({ ...prev, address: fallback }));
+          const geocodeResult = await fetchReverseGeocode(latitude, longitude);
+
+          if (geocodeResult) {
+            setFormData((prev) => ({
+              ...prev,
+              address: geocodeResult.fullAddress || prev.address,
+              houseNumber: geocodeResult.houseNumber || prev.houseNumber,
+              area: geocodeResult.area || prev.area,
+              city: geocodeResult.city || prev.city,
+              district: geocodeResult.district || prev.district,
+              state: geocodeResult.state || prev.state,
+              pin: geocodeResult.pin || prev.pin,
+            }));
+
             setLocationStatus("success");
-            setLocationVerified(true);
-            setLocationMessage("");
-            toast.success("Location detected!");
+            setLocationMessage(`Location detected — accuracy ${roundAccuracy} meters`);
+            toast.success(`✓ Address detected (${geocodeResult.source === "google" ? "Google Maps" : "OSM"})!`);
+          } else {
+            setLocationStatus("success");
+            setLocationMessage(`Location detected — accuracy ${roundAccuracy} meters`);
+            toast.success(`Location detected — accuracy ${roundAccuracy} meters`);
           }
         } catch (err) {
-          const fallback = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-          setFormData((prev) => ({ ...prev, address: fallback }));
+          console.error("Reverse Geocode Error:", err);
           setLocationStatus("success");
-          setLocationVerified(true);
-          setLocationMessage("");
-          toast.success("Location coordinates detected!");
+          setLocationMessage(`Location detected — accuracy ${roundAccuracy} meters`);
+          toast.success(`Location detected — accuracy ${roundAccuracy} meters`);
         }
       },
       (error) => {
-        setLocationVerified(false);
+        setGpsLocation(null);
         if (error.code === error.PERMISSION_DENIED) {
           setLocationStatus("denied");
-          setLocationMessage("Please allow location access to continue.");
-          toast.error("Please allow location access to continue.");
+          setLocationMessage("Location access denied. Please allow location permission in browser settings.");
+          toast.error("Location permission denied by user.");
         } else if (error.code === error.POSITION_UNAVAILABLE) {
           setLocationStatus("error");
-          setLocationMessage("Location information is unavailable. Please click 'Use Current Location' again.");
-          toast.error("Location information is unavailable.");
+          setLocationMessage("Location information unavailable. Please check device GPS and try again.");
+          toast.error("Location information unavailable.");
         } else if (error.code === error.TIMEOUT) {
           setLocationStatus("error");
-          setLocationMessage("Location request timed out. Please try again.");
+          setLocationMessage("Location request timed out. Please click 'Try Again'.");
           toast.error("Location request timed out.");
         } else {
           setLocationStatus("error");
-          setLocationMessage("Could not fetch location. Please try again.");
-          toast.error("Could not fetch location.");
+          setLocationMessage("Could not detect location. Please click 'Try Again'.");
+          toast.error("Could not detect location.");
         }
       },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
     );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!locationVerified || !formData.address.trim()) {
-      toast.error("Please click 'Use Current Location' to allow location access and verify your location to continue.");
+    if (!formData.fullName.trim() || !formData.mobile.trim() || !formData.address.trim()) {
+      toast.error("Please fill in all required fields marked with * (Full Name, Mobile Number, and Address).");
       return;
     }
 
-    if (!formData.fullName.trim() || !formData.mobile.trim()) {
-      toast.error("Please fill in all required fields (Full Name, Mobile Number, and Address).");
-      return;
-    }
-
+    if (isSubmitting) return;
     setIsSubmitting(true);
+    setApiError(null);
+
+    const payload = {
+      fullName: formData.fullName.trim(),
+      phone: formData.mobile.trim(),
+      email: formData.email?.trim() || undefined,
+      address: formData.address.trim(),
+      houseNumber: formData.houseNumber?.trim() || undefined,
+      area: formData.area?.trim() || undefined,
+      city: formData.city?.trim() || "Mau",
+      district: formData.district?.trim() || undefined,
+      state: formData.state?.trim() || "Uttar Pradesh",
+      pincode: formData.pin?.trim() || undefined,
+      latitude: gpsLocation?.latitude,
+      longitude: gpsLocation?.longitude,
+      accuracy: gpsLocation?.accuracy ? `${gpsLocation.accuracy} meters` : undefined,
+      googleMapsUrl: gpsLocation?.googleMapsUrl,
+      monthlyBillAmount: parseFloat(formData.bill) || undefined,
+      electricityRate: parseFloat(formData.rate) || 8.0,
+      solarType: formData.systemType || "On-Grid",
+      contactTime: formData.contactTime || "Any Time",
+      message: formData.message?.trim() || undefined,
+    };
 
     try {
-      // BACKEND API ENDPOINT HOOK:
-      // await axios.post('/api/quote-request', formData);
-      await new Promise((resolve) => setTimeout(resolve, 900));
-
-      toast.success("Thank you! Your free quote request has been received. Our solar expert will contact you shortly.");
+      const res = await api.post<any>("/api/v1/quotations", payload);
+      setQuoteResponse(res);
       setSubmitted(true);
-    } catch (err) {
-      toast.error("Failed to submit request. Please try again.");
+      toast.success("Quote request received successfully!", {
+        description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+      });
+    } catch (err: any) {
+      console.error("Quotation Form API error:", err);
+      const errMsg = err.message || "Failed to submit quote request. Please try again.";
+      setApiError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -158,7 +224,7 @@ export const SolarQuoteForm = ({
             Request a Custom <span className="text-gradient">Solar Estimate</span>
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Fill in your details below and our engineers will prepare a transparent proposal.
+            Fill in your details below and our solar engineers will prepare a transparent proposal.
           </p>
         </div>
 
@@ -168,12 +234,32 @@ export const SolarQuoteForm = ({
               <Send className="h-7 w-7" />
             </div>
             <h4 className="text-xl font-bold text-foreground">Quote Request Received!</h4>
+            {quoteResponse?.quoteNumber && (
+              <div className="inline-block rounded-lg border border-amber-500/40 bg-amber-500/10 px-3.5 py-1.5 text-xs font-mono font-bold text-amber-500">
+                Quote Reference Code: {quoteResponse.quoteNumber}
+              </div>
+            )}
+            {quoteResponse?.calculation && (
+              <div className="max-w-md mx-auto rounded-2xl border border-border/80 bg-muted/30 p-4 text-xs text-foreground space-y-1">
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  Recommended System: {quoteResponse.calculation.recommendedPlantSizeKw} kW
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {quoteResponse.calculation.panelSpecs?.requiredPanels} Panels × 530W · {quoteResponse.calculation.panelSpecs?.requiredRoofAreaSqFt} sq. ft. Roof Area
+                </p>
+              </div>
+            )}
             <p className="max-w-md mx-auto text-xs text-muted-foreground leading-relaxed">
-              Thank you! Your free quote request has been received. Our solar expert will contact you shortly.
+              Thank you! Your quote request has been saved. Our solar expert will contact you shortly.
             </p>
             <div className="pt-2">
               <Button
-                onClick={() => setSubmitted(false)}
+                onClick={() => {
+                  setSubmitted(false);
+                  setQuoteResponse(null);
+                  setLocationStatus("idle");
+                  setGpsLocation(null);
+                }}
                 variant="outline"
                 className="rounded-full px-5 text-xs font-semibold"
               >
@@ -215,7 +301,7 @@ export const SolarQuoteForm = ({
                 />
               </div>
 
-              {/* Email */}
+              {/* Email Address */}
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="email" className="text-xs font-medium text-foreground">
                   Email Address
@@ -230,84 +316,196 @@ export const SolarQuoteForm = ({
                 />
               </div>
 
-              {/* Address * with Mandated Location Verification */}
-              <div className="space-y-1.5 sm:col-span-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Label htmlFor="address" className="text-xs font-medium text-foreground">
-                    Address <span className="text-destructive">*</span>
+              {/* Installation Location & Address Section */}
+              <div className="space-y-2.5 sm:col-span-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <Label className="text-xs font-bold text-foreground">
+                    Installation Address <span className="text-destructive">*</span>
                   </Label>
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     onClick={handleDetectLocation}
-                    disabled={locationStatus === "detecting"}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                      locationVerified
-                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25"
-                        : locationStatus === "denied"
-                        ? "bg-rose-500/15 text-rose-500 border border-rose-500/30 hover:bg-rose-500/25"
-                        : "bg-primary/10 text-primary border border-primary/25 hover:bg-primary/20"
-                    }`}
+                    disabled={locationStatus === "detecting" || locationStatus === "fetching_address"}
+                    className="btn-premium rounded-full border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs h-9 px-4 shadow-sm w-full sm:w-auto flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
-                    {locationStatus === "detecting" ? (
+                    {locationStatus === "detecting" || locationStatus === "fetching_address" ? (
                       <>
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                        Detecting your location...
-                      </>
-                    ) : locationVerified ? (
-                      <>
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                        ✓ Location Added
+                        {locationStatus === "fetching_address" ? "Fetching Address..." : "Detecting Location..."}
                       </>
                     ) : (
-                      <>
-                        <MapPin className="h-3.5 w-3.5" />
-                        📍 Use Current Location
-                      </>
+                      <>📍 Use My Current Location</>
                     )}
-                  </button>
+                  </Button>
                 </div>
-                <div className="relative">
-                  <Input
-                    id="address"
-                    required
-                    placeholder={
-                      locationVerified
-                        ? "e.g. House No, Locality, City, State, PIN"
-                        : "Click '📍 Use Current Location' above to detect address"
-                    }
-                    value={formData.address}
-                    onChange={(e) => {
-                      // Note: Typing or editing address does NOT set locationVerified to true!
-                      setFormData({ ...formData, address: e.target.value });
-                    }}
-                    className="h-10 text-xs rounded-xl pr-10"
-                  />
-                  <div className="absolute right-3 top-2.5 text-muted-foreground pointer-events-none">
-                    <MapPin className="h-4 w-4 text-muted-foreground/60" />
+
+                {/* Status Area */}
+                <div className="rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
+                  {locationStatus === "idle" && (
+                    <p className="font-medium text-[11px] text-muted-foreground flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <span>Ready to detect your current location.</span>
+                    </p>
+                  )}
+
+                  {locationStatus === "detecting" && (
+                    <p className="font-medium text-[11px] text-primary flex items-center gap-1.5">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-primary shrink-0" />
+                      <span>📍 Detecting your current location...</span>
+                    </p>
+                  )}
+
+                  {locationStatus === "fetching_address" && (
+                    <p className="font-medium text-[11px] text-amber-500 dark:text-amber-400 flex items-center gap-1.5">
+                      <RefreshCw className="h-3.5 w-3.5 animate-spin text-amber-500 shrink-0" />
+                      <span>🔄 Fetching your address...</span>
+                    </p>
+                  )}
+
+                  {locationStatus === "success" && gpsLocation && (
+                    <div className="space-y-1.5">
+                      <div className="flex flex-wrap items-center justify-between gap-1">
+                        <span className="font-bold text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                          ✓ Location Detected
+                        </span>
+                        <span className="text-[10px] font-semibold text-muted-foreground bg-background/60 px-2 py-0.5 rounded-full border">
+                          Accuracy: {gpsLocation.accuracy} meters
+                        </span>
+                      </div>
+
+                      <p className="text-[10px] text-muted-foreground font-mono">
+                        GPS: {gpsLocation.latitude.toFixed(6)}, {gpsLocation.longitude.toFixed(6)} ({gpsLocation.timestamp})
+                      </p>
+
+                      <div className="pt-1.5 border-t border-emerald-500/20">
+                        <a
+                          href={gpsLocation.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline cursor-pointer"
+                        >
+                          📍 View Installation Location on Google Maps <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
+                  {(locationStatus === "error" || locationStatus === "denied") && (
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-medium text-[11px] text-rose-500 flex items-center gap-1.5">
+                        <AlertCircle className="h-3.5 w-3.5 text-rose-500 shrink-0" />
+                        <span>{locationMessage}</span>
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleDetectLocation}
+                        className="px-2.5 py-0.5 rounded-md bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 text-[10px] font-bold border border-rose-500/20 transition-all cursor-pointer"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Address Fields */}
+                <div className="grid gap-2.5 sm:grid-cols-2 pt-1">
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="address" className="text-[11px] font-medium text-foreground">
+                      Complete Address <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="address"
+                      required
+                      placeholder="e.g. House No, Locality, City, State, PIN"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      className="h-9.5 text-xs rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="houseNumber" className="text-[11px] font-medium text-foreground">
+                      House / Plot No.
+                    </Label>
+                    <Input
+                      id="houseNumber"
+                      placeholder="e.g. 275, Block A"
+                      value={formData.houseNumber}
+                      onChange={(e) => setFormData({ ...formData, houseNumber: e.target.value })}
+                      className="h-9 text-xs rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="area" className="text-[11px] font-medium text-foreground">
+                      Area / Block / Village
+                    </Label>
+                    <Input
+                      id="area"
+                      placeholder="e.g. Beta 1, Sector 20"
+                      value={formData.area}
+                      onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                      className="h-9 text-xs rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="city" className="text-[11px] font-medium text-foreground">
+                      City
+                    </Label>
+                    <Input
+                      id="city"
+                      placeholder="e.g. Greater Noida"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="h-9 text-xs rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="district" className="text-[11px] font-medium text-foreground">
+                      District
+                    </Label>
+                    <Input
+                      id="district"
+                      placeholder="e.g. Gautam Buddha Nagar"
+                      value={formData.district}
+                      onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                      className="h-9 text-xs rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="state" className="text-[11px] font-medium text-foreground">
+                      State
+                    </Label>
+                    <Input
+                      id="state"
+                      placeholder="e.g. Uttar Pradesh"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      className="h-9 text-xs rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="pin" className="text-[11px] font-medium text-foreground">
+                      PIN Code
+                    </Label>
+                    <Input
+                      id="pin"
+                      placeholder="e.g. 201308"
+                      value={formData.pin}
+                      onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
+                      className="h-9 text-xs rounded-xl"
+                    />
                   </div>
                 </div>
-
-                {/* Status & Error Messages */}
-                {locationStatus === "denied" && (
-                  <p className="text-xs font-bold text-rose-500 flex items-center gap-1 mt-1">
-                    ⚠️ Please allow location access to continue.
-                  </p>
-                )}
-
-                {locationStatus === "error" && locationMessage && (
-                  <p className="text-xs font-semibold text-rose-400 flex items-center gap-1 mt-1">
-                    ⚠️ {locationMessage}
-                  </p>
-                )}
-
-                {!locationVerified && locationStatus !== "denied" && locationStatus !== "error" && (
-                  <p className="text-[11px] font-medium text-amber-500 dark:text-amber-400 flex items-center gap-1 mt-1">
-                    <Lock className="h-3 w-3" /> Please allow location access using '📍 Use Current Location' to unlock form submission.
-                  </p>
-                )}
               </div>
 
-              {/* Monthly Electricity Bill (₹) - Locked until Location Verified */}
+              {/* Monthly Electricity Bill (₹) */}
               <div className="space-y-1.5">
                 <Label htmlFor="bill" className="text-xs font-medium text-foreground">
                   Monthly Bill (₹)
@@ -316,15 +514,14 @@ export const SolarQuoteForm = ({
                   id="bill"
                   type="number"
                   min={0}
-                  disabled={!locationVerified}
                   placeholder="e.g. 5000"
                   value={formData.bill}
                   onChange={(e) => setFormData({ ...formData, bill: e.target.value })}
-                  className="h-10 text-xs rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 text-xs rounded-xl"
                 />
               </div>
 
-              {/* Monthly Electricity Consumption (Units) - Locked until Location Verified */}
+              {/* Monthly Electricity Consumption (Units) */}
               <div className="space-y-1.5">
                 <Label htmlFor="units" className="text-xs font-medium text-foreground">
                   Consumption (Units)
@@ -333,15 +530,14 @@ export const SolarQuoteForm = ({
                   id="units"
                   type="number"
                   min={0}
-                  disabled={!locationVerified}
                   placeholder="e.g. 600"
                   value={formData.units}
                   onChange={(e) => setFormData({ ...formData, units: e.target.value })}
-                  className="h-10 text-xs rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 text-xs rounded-xl"
                 />
               </div>
 
-              {/* Electricity Rate (₹/unit) - Locked until Location Verified */}
+              {/* Electricity Rate (₹/unit) */}
               <div className="space-y-1.5">
                 <Label htmlFor="rate" className="text-xs font-medium text-foreground">
                   Rate (₹/unit)
@@ -351,25 +547,23 @@ export const SolarQuoteForm = ({
                   type="number"
                   step="0.1"
                   min={0}
-                  disabled={!locationVerified}
                   placeholder="e.g. 7.50"
                   value={formData.rate}
                   onChange={(e) => setFormData({ ...formData, rate: e.target.value })}
-                  className="h-10 text-xs rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 text-xs rounded-xl"
                 />
               </div>
 
-              {/* Preferred Contact Time - Locked until Location Verified */}
+              {/* Preferred Contact Time */}
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="contactTime" className="text-xs font-medium text-foreground">
                   Preferred Contact Time
                 </Label>
                 <Select
                   value={formData.contactTime}
-                  disabled={!locationVerified}
                   onValueChange={(val) => setFormData({ ...formData, contactTime: val })}
                 >
-                  <SelectTrigger className="h-10 text-xs rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                  <SelectTrigger className="h-10 text-xs rounded-xl">
                     <SelectValue placeholder="Select Contact Time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -381,7 +575,7 @@ export const SolarQuoteForm = ({
                 </Select>
               </div>
 
-              {/* Message / Requirement - Locked until Location Verified */}
+              {/* Message / Requirement */}
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="message" className="text-xs font-medium text-foreground">
                   Message / Requirement
@@ -389,11 +583,10 @@ export const SolarQuoteForm = ({
                 <Textarea
                   id="message"
                   rows={3}
-                  disabled={!locationVerified}
                   placeholder="Tell us about your roof area or requirements..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="text-xs rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-xs rounded-xl"
                 />
               </div>
             </div>
@@ -401,18 +594,12 @@ export const SolarQuoteForm = ({
             <div className="pt-2">
               <Button
                 type="submit"
-                disabled={isSubmitting || !locationVerified}
+                disabled={isSubmitting}
                 className="btn-premium w-full h-11 rounded-full bg-gradient-brand font-bold text-primary-foreground shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Submitting Request...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    REQUEST FREE QUOTE <Send className="h-4 w-4" />
-                  </span>
-                )}
+                <span className="flex items-center justify-center gap-2">
+                  REQUEST FREE QUOTE <Send className="h-4 w-4" />
+                </span>
               </Button>
             </div>
           </form>

@@ -20,6 +20,10 @@ import {
   MessageCircle,
   Sparkles,
   TrendingUp,
+  Loader2,
+  AlertCircle,
+  ShieldCheck,
+  PiggyBank,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -158,6 +162,8 @@ const CountUpValue = ({
   );
 };
 
+import { api } from "@/lib/api";
+
 export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
   const [billStr, setBillStr] = useState("6000");
   const [unitsStr, setUnitsStr] = useState("750");
@@ -167,8 +173,11 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
   const [roof, setRoof] = useState(roofTypes[0]);
   const [connection, setConnection] = useState(connectionTypes[0]);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [backendData, setBackendData] = useState<any>(null);
 
-  // Parse inputs safely for calculations
+  // Parse inputs safely
   const bill = parseFloat(billStr) || 0;
   const units = parseFloat(unitsStr) || 0;
   const rate = parseFloat(rateStr) || 0;
@@ -212,47 +221,82 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
     }
   };
 
-  // Dynamic result calculation
+  // Fetch calculation from backend API
+  const calculateWithBackend = async (
+    bVal: number = bill,
+    uVal: number = units,
+    rVal: number = rate
+  ) => {
+    if (loading) return; // Prevent duplicate concurrent requests
+    setLoading(true);
+    setError(null);
+
+    try {
+      const payload = {
+        monthlyBillAmount: bVal > 0 ? bVal : undefined,
+        monthlyUnits: uVal > 0 ? uVal : undefined,
+        electricityRate: rVal > 0 ? rVal : 8.0,
+        state,
+        city,
+      };
+
+      const res = await api.post<any>("/api/v1/calculator/calculate", payload);
+
+      if (res && res.data) {
+        setBackendData(res.data);
+      }
+    } catch (err: any) {
+      console.error("Backend solar calculator API error:", err);
+      setError(err.message || "Unable to calculate solar savings from backend API.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial backend calculation on component mount
+  useEffect(() => {
+    calculateWithBackend();
+  }, []);
+
+  // Derive results strictly from authoritative backend response
   const result = useMemo(() => {
-    const safeUnits = Math.max(50, units || (rate > 0 ? Math.round(bill / rate) : 0));
+    if (backendData) {
+      return {
+        kw: backendData.recommendedPlantSizeKw,
+        requiredPanels: backendData.panelSpecs.requiredPanels,
+        requiredRoofArea: backendData.panelSpecs.requiredRoofAreaSqFt,
+        monthlyGen: backendData.generation.monthlyKwh,
+        monthlySavings: backendData.financials.monthlySavingsRs,
+        annualSavings: backendData.financials.annualSavingsRs,
+        co2Tonnes: backendData.environmental.co2ReductionTonnesPerYear,
+        totalSubsidy: backendData.financials.totalSubsidyRs,
+        centralSubsidy: backendData.financials.centralSubsidyRs,
+        stateSubsidy: backendData.financials.stateSubsidyRs,
+        netCost: backendData.financials.netCostRs,
+        paybackPeriod: backendData.financials.paybackPeriodYears,
+        grossCost: backendData.financials.grossCostRs,
+        rate: rate > 0 ? rate : 8.0,
+      };
+    }
 
-    // 1. Recommended Plant Size (kW) based on monthly consumption (1 kW ~ 120 units/mo)
-    const kwFromUnits = safeUnits / 120;
-    const kw = Number(Math.max(0.25, kwFromUnits).toFixed(2));
-
-    // 2. Required Roof Area using exact 530W panel specs:
-    // Panel Capacity = 530W = 0.53 kW
-    // Panel Dimensions = 7.48 ft × 3.72 ft -> One Panel Area = 27.8256 sq. ft.
-    // Required Panels = CEILING(Recommended Plant Size ÷ 0.53)
-    // Panel Footprint / Required Roof Area = Required Panels × 27.8256 sq. ft.
-    const PANEL_CAPACITY_KW = 0.53;
-    const SINGLE_PANEL_AREA = 7.48 * 3.72; // 27.8256 sq. ft.
-    const requiredPanels = Math.ceil(kw / PANEL_CAPACITY_KW);
-    const requiredRoofArea = Number((requiredPanels * SINGLE_PANEL_AREA).toFixed(2));
-
-    // 3. Monthly & Annual Generation & Financial Savings
-    const monthlyGen = kw * 120;
-    const activeRate = rate > 0 ? rate : 8.0;
-    const calculatedSavings = Math.round(monthlyGen * activeRate);
-    const actualMonthlyBill = bill > 0 ? bill : Math.round(safeUnits * activeRate);
-    const monthlySavings = Math.min(calculatedSavings, Math.round(actualMonthlyBill));
-    const annualSavings = monthlySavings * 12;
-
-    // 4. Environmental CO2 Reduction Metric (CEA Indian grid factor: 0.7117 kg CO2/kWh)
-    const annualKwh = monthlyGen * 12;
-    const co2Tonnes = Number(((annualKwh * 0.7117) / 1000).toFixed(2));
-
+    // Default fallback while initial fetch completes
     return {
-      kw,
-      requiredPanels,
-      requiredRoofArea,
-      monthlyGen,
-      monthlySavings,
-      annualSavings,
-      co2Tonnes,
-      rate: activeRate,
+      kw: 6.0,
+      requiredPanels: 12,
+      requiredRoofArea: 333.96,
+      monthlyGen: 810,
+      monthlySavings: 6480,
+      annualSavings: 77760,
+      co2Tonnes: 7.97,
+      totalSubsidy: 108000,
+      centralSubsidy: 78000,
+      stateSubsidy: 30000,
+      netCost: 222000,
+      paybackPeriod: 2.9,
+      grossCost: 330000,
+      rate: 8.0,
     };
-  }, [units, bill, rate]);
+  }, [backendData, rate]);
 
   // Chart 1: 10-Year Cumulative Savings Data
   const cumulativeSavingsData = useMemo(() => {
@@ -352,14 +396,22 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5 }}
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 setSubmitted(true);
+                await calculateWithBackend();
                 toast.success(`Solar savings calculated for ${city}, ${state}!`);
               }}
               className="group calc-card-glow relative transition-all duration-500"
             >
               <div className="relative h-full w-full overflow-hidden rounded-3xl p-6 md:p-8 space-y-4 transition-all duration-500 calc-card-gradient-border">
+                {error && (
+                  <div className="flex items-center gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs text-destructive">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="bill">Monthly Electricity Bill (₹)</Label>
                   <Input
@@ -460,9 +512,17 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
 
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="btn-premium h-12 w-full rounded-full bg-gradient-brand text-base font-semibold text-primary-foreground shadow-glow mt-2"
                 >
-                  Calculate Savings
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Calculating Backend Savings...
+                    </>
+                  ) : (
+                    "Calculate Savings"
+                  )}
                 </Button>
 
                 {submitted && (
@@ -579,6 +639,43 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
                         <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground font-semibold">CO₂ Reduction</p>
                         <p className="mt-1.5 font-display text-xl font-bold text-emerald-600">
                           <CountUpValue value={result.co2Tonnes} suffix=" Tonnes / yr" decimals={2} />
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* 3. SUBSIDY & PAYBACK BREAKDOWN CARD (Backend Authoritative Values) */}
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                  <motion.div whileHover={{ y: -4 }} className="group calc-card-glow relative transition-all duration-500">
+                    <div className="relative flex h-full min-h-[140px] flex-col justify-between rounded-2xl border bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-500/20 p-5 shadow-soft">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20">
+                        <PiggyBank className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      </span>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground font-semibold">Government Subsidy</p>
+                        <p className="mt-1.5 font-display text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                          <CountUpValue value={result.totalSubsidy} prefix="₹ " />
+                        </p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          Central: ₹{result.centralSubsidy.toLocaleString('en-IN')} · State: ₹{result.stateSubsidy.toLocaleString('en-IN')}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div whileHover={{ y: -4 }} className="group calc-card-glow relative transition-all duration-500">
+                    <div className="relative flex h-full min-h-[140px] flex-col justify-between rounded-2xl border bg-primary/5 dark:bg-primary/10 border-primary/20 p-5 shadow-soft">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20">
+                        <ShieldCheck className="h-5 w-5 text-primary" />
+                      </span>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground font-semibold">Estimated Net Investment</p>
+                        <p className="mt-1.5 font-display text-xl font-bold text-primary">
+                          <CountUpValue value={result.netCost} prefix="₹ " />
+                        </p>
+                        <p className="mt-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                          Payback Period: ~{result.paybackPeriod} Years
                         </p>
                       </div>
                     </div>

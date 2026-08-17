@@ -141,20 +141,20 @@ export const Navbar = () => {
       }`}
     >
       <nav className="container-wide flex h-[74px] items-center justify-between gap-4" aria-label="Main navigation">
-        {/* Floating Logo Animation */}
-        <Link to="/" className="group flex items-center gap-2.5">
+        {/* Header Logo & Brand Wordmark */}
+        <Link to="/" className="group flex items-center gap-2.5 shrink-0 mr-6 sm:mr-8 lg:mr-10">
           <motion.div
             animate={{ y: [0, -3.5, 0] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
             className="flex items-center gap-2.5"
           >
-            <motion.span
-              animate={{ rotate: [0, 6, 0, -6, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="btn-premium relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-brand shadow-glow transition-transform duration-500 group-hover:scale-105"
-            >
-              <Sun className="h-5 w-5 text-primary-foreground transition-transform duration-700 group-hover:rotate-180" />
-            </motion.span>
+            <motion.img
+              src="/logo-icon.png"
+              alt="SSR Solar Power Logo Icon"
+              whileHover={{ scale: 1.08 }}
+              transition={{ duration: 0.3 }}
+              className="h-10 w-10 sm:h-11 sm:w-11 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
+            />
             <BrandWordmark onDark={onDark} className="text-base sm:text-lg" />
           </motion.div>
         </Link>

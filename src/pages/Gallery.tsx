@@ -6,7 +6,7 @@ import { PageHero } from "@/components/PageHero";
 import { CtaBanner } from "@/components/sections/CtaBanner";
 import { galleryImages } from "@/data/site";
 
-const categories = ["All", "Residential", "Commercial", "Products", "Maintenance"];
+const categories = ["All", "Residential", "Commercial"];
 
 const Gallery = () => {
   const [active, setActive] = useState("All");

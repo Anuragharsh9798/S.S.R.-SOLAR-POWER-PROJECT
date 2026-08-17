@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:backup": "npm --prefix backend run db:backup",
+    "db:backup:referrals": "npm --prefix backend run db:backup:referrals"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",

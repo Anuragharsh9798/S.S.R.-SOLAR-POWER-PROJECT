@@ -65,7 +65,7 @@ export const navLinks = [
 export const heroCards = [
   { icon: ShieldCheck, title: "25 Years", subtitle: "Performance Warranty" },
   { icon: Users, title: "1000+", subtitle: "Installations" },
-  { icon: Landmark, title: "Central & State Government Subsidy", subtitle: "Government Approved" },
+  { icon: Landmark, title: "Government Subsidy", subtitle: "Government Approved" },
   { icon: LifeBuoy, title: "24×7", subtitle: "Support Desk" },
 ];
 
@@ -92,8 +92,8 @@ export const whyChoose = [
   },
   {
     icon: Landmark,
-    title: "Central & State Government Subsidy Assistance",
-    description: "Our experts guide customers through the complete Central & State Government solar subsidy process including eligibility verification, documentation and application support.",
+    title: "Government Subsidy Assistance",
+    description: "Our experts guide customers through the complete government solar subsidy process including eligibility verification, documentation and application support.",
   },
   {
     icon: Sun,
