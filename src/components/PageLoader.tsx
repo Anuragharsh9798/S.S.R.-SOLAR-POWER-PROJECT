@@ -3,11 +3,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Sparkles } from "lucide-react";
 import { BrandWordmark } from "./BrandWordmark";
 
+const SESSION_STORAGE_KEY = "ssr_solar_session_loaded";
+
 export const PageLoader = () => {
-  const [progress, setProgress] = useState(0);
-  const [done, setDone] = useState(false);
+  const [hasVisited] = useState(() => {
+    try {
+      return sessionStorage.getItem(SESSION_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [progress, setProgress] = useState(hasVisited ? 100 : 0);
+  const [done, setDone] = useState(hasVisited);
 
   useEffect(() => {
+    if (hasVisited) return;
+
     // Duration: ~1.65 seconds (1650ms), within the required 1.5–2.0 second window
     const duration = 1650;
     let startTime: number | null = null;
@@ -24,6 +36,11 @@ export const PageLoader = () => {
         animId = requestAnimationFrame(step);
       } else {
         setProgress(100);
+        try {
+          sessionStorage.setItem(SESSION_STORAGE_KEY, "true");
+        } catch {
+          // Ignore storage errors if private browsing restricts it
+        }
         // Short pause at 100% before triggering exit fade
         const timer = setTimeout(() => setDone(true), 120);
         return () => clearTimeout(timer);
@@ -32,7 +49,9 @@ export const PageLoader = () => {
 
     animId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(animId);
-  }, []);
+  }, [hasVisited]);
+
+  if (done) return null;
 
   return (
     <AnimatePresence mode="wait">

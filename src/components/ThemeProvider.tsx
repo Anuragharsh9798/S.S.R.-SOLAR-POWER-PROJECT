@@ -19,14 +19,30 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   });
 
+  const [isInitialMount, setIsInitialMount] = useState(true);
+
   useEffect(() => {
     const root = document.documentElement;
+
+    if (!isInitialMount) {
+      root.classList.add("theme-transitioning");
+    }
+
     if (theme === "dark") {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
     window.localStorage.setItem("ssr-theme", theme);
+
+    if (!isInitialMount) {
+      const timer = setTimeout(() => {
+        root.classList.remove("theme-transitioning");
+      }, 700);
+      return () => clearTimeout(timer);
+    } else {
+      setIsInitialMount(false);
+    }
   }, [theme]);
 
   const toggleTheme = () => {

@@ -22,6 +22,21 @@ export class CreateReviewDto {
   @IsString()
   solarType?: string;
 
+  @IsOptional()
+  @IsString()
+  installType?: string;
+
+  @IsOptional()
+  @IsString()
+  performance?: string;
+
+  @IsOptional()
+  @IsString()
+  experience?: string;
+
+  @IsOptional()
+  likedAspects?: string[];
+
   @IsNotEmpty({ message: 'Review quote text is required' })
   @IsString()
   quote: string;

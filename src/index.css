@@ -169,10 +169,12 @@
     pointer-events: none;
   }
 
-  /* Smooth 700ms Day/Night theme cross-fade across all sections & components */
-  html, body, section, footer, header, nav, article, main, aside,
-  .card-premium, .card-hover, .section, .bg-surface, .bg-card, .bg-muted {
-    transition: background-color 700ms ease-in-out, border-color 700ms ease-in-out, color 700ms ease-in-out, box-shadow 700ms ease-in-out;
+  /* Smooth 700ms Day/Night theme cross-fade ONLY active during theme toggling */
+  html.theme-transitioning,
+  html.theme-transitioning *,
+  html.theme-transitioning *::before,
+  html.theme-transitioning *::after {
+    transition: background-color 700ms ease-in-out, border-color 700ms ease-in-out, color 700ms ease-in-out, box-shadow 700ms ease-in-out !important;
   }
 
   body {

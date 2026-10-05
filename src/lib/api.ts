@@ -4,8 +4,16 @@
  * with HttpOnly credentials, timeout, error handling, and environment-based baseURL.
  */
 
-const API_BASE_URL =
-  (import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000';
+const getBaseUrl = () => {
+  if (import.meta.env && import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // In browser, relative URL allows Vite dev proxy or production reverse proxy to route automatically
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+  return 'http://localhost:3000';
+};
 
 export interface ApiErrorResponse {
   statusCode?: number;
@@ -44,11 +52,15 @@ export async function fetchApi<T>(
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${API_BASE_URL}${cleanEndpoint}`;
+  const baseUrl = getBaseUrl();
+  const url = `${baseUrl}${cleanEndpoint}`;
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
   const config: RequestInit = {
@@ -115,6 +127,18 @@ export async function fetchApi<T>(
 
 // Convenience REST Helpers
 export const api = {
+  getToken: () => (typeof window !== 'undefined' ? localStorage.getItem('access_token') : null),
+
+  setToken: (token: string | null) => {
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('access_token', token);
+      } else {
+        localStorage.removeItem('access_token');
+      }
+    }
+  },
+
   get: <T>(endpoint: string, options?: FetchOptions) =>
     fetchApi<T>(endpoint, { ...options, method: 'GET' }),
 

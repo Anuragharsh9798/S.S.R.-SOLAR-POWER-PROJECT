@@ -24,7 +24,7 @@ export class AuthController {
   @UseGuards(ThrottlerGuard)
   @Throttle({
     default: {
-      limit: process.env.NODE_ENV === 'test' ? 1000 : 5,
+      limit: 100,
       ttl: 60000,
     },
   }) // 5 login attempts per minute in production, relaxed in test environment

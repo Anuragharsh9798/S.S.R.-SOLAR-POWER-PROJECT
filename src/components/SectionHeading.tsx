@@ -24,7 +24,7 @@ export const SectionHeading = ({
     className={`max-w-3xl ${align === "center" ? "mx-auto text-center" : ""} ${className}`}
   >
     {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-    <h2 className="mt-5 text-3xl leading-tight text-balance sm:text-4xl md:text-[2.75rem]">{title}</h2>
+    <h2 className="mt-3.5 text-3xl leading-tight text-balance sm:text-4xl md:text-[2.75rem]">{title}</h2>
     {description && <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">{description}</p>}
   </motion.div>
 );

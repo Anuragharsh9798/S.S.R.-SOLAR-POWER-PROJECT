@@ -67,15 +67,15 @@ export const RealTimeMonitoring = () => {
   };
 
   return (
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft overflow-hidden relative py-20 md:py-28">
+    <MotionSection animation="fadeUp" className="section bg-gradient-soft overflow-hidden relative py-10 md:py-14">
       {/* Background Radial Glow Blobs */}
       <div className="blob -left-20 top-20 h-80 w-80 bg-primary/15" aria-hidden />
       <div className="blob -right-20 bottom-10 h-80 w-80 bg-emerald-500/15" aria-hidden />
 
       <div className="container-wide relative">
-        <div className="grid items-center gap-12 lg:grid-cols-12">
+        <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
           {/* ================= LEFT SIDE: TEXT CONTENT (UNTOUCHED) ================= */}
-          <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
+          <div className="lg:col-span-6 space-y-4 md:space-y-5 text-center lg:text-left">
             <span className="eyebrow inline-flex items-center gap-2">
               <Smartphone className="h-4 w-4 text-primary" /> Smart IoT Monitoring
             </span>

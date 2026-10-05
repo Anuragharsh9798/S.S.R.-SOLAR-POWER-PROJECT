@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { ArrowUp, Mail, Phone } from "lucide-react";
+import { ArrowUp, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { company } from "@/data/site";
 import { SolarChatbot } from "./SolarChatbot";
+import { scrollToTop } from "./SmoothScroll";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg
@@ -19,7 +20,19 @@ export const FloatingActions = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setShowBackToTop(window.scrollY > 400);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const shouldShow = window.scrollY > 400;
+          setShowBackToTop((prev) => (prev !== shouldShow ? shouldShow : prev));
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -37,22 +50,13 @@ export const FloatingActions = () => {
       floatDelay: 0,
     },
     {
-      id: "call",
-      label: "Call us",
-      href: `tel:${company.phone}`,
-      icon: Phone,
-      bgClass: "bg-accent text-accent-foreground shadow-[0_0_20px_rgba(37,99,235,0.6)] hover:shadow-[0_0_28px_rgba(37,99,235,0.9)]",
-      pulseClass: "bg-accent/40",
-      floatDelay: 0.3,
-    },
-    {
       id: "email",
       label: "Email us",
       href: `mailto:${company.email}`,
       icon: Mail,
       bgClass: "bg-secondary text-secondary-foreground shadow-[0_0_20px_rgba(250,204,21,0.6)] hover:shadow-[0_0_28px_rgba(250,204,21,0.9)]",
       pulseClass: "bg-secondary/40",
-      floatDelay: 0.6,
+      floatDelay: 0.3,
     },
   ];
 
@@ -122,7 +126,7 @@ export const FloatingActions = () => {
             }}
             whileHover={{ y: -8, scale: 1.15 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() => scrollToTop()}
             aria-label="Back to top"
             className="group relative flex h-12 w-12 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-glow hover:border-primary/60 hover:shadow-[0_0_22px_rgba(22,163,74,0.6)] transition-all duration-300"
           >

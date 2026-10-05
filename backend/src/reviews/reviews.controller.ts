@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Patch,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -24,7 +25,7 @@ export class ReviewsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } }) // Max 5 review submissions per minute per IP
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   create(@Body() dto: CreateReviewDto) {
     return this.reviewsService.create(dto);
   }
@@ -39,15 +40,33 @@ export class ReviewsController {
 
 @Controller('api/v1/admin/reviews')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.CONTENT_MANAGER)
 export class AdminReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
+  @Get()
+  @Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.STAFF)
+  findAllAdmin() {
+    return this.reviewsService.findAllAdmin();
+  }
+
   @Patch(':id/approve')
+  @Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN)
   approveReview(
     @Param('id') id: string,
     @Body('isApproved') isApproved: boolean = true,
   ) {
-    return this.reviewsService.approveReview(id, isApproved);
+    return this.reviewsService.approveReview(id, isApproved !== false);
+  }
+
+  @Patch(':id/reject')
+  @Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN)
+  rejectReview(@Param('id') id: string) {
+    return this.reviewsService.approveReview(id, false);
+  }
+
+  @Delete(':id')
+  @Roles(RoleEnum.SUPER_ADMIN)
+  remove(@Param('id') id: string) {
+    return this.reviewsService.remove(id);
   }
 }

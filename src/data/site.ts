@@ -15,11 +15,15 @@ import {
 } from "lucide-react";
 import residentialSolarService from "@/assets/service-residential-solar.png";
 import commercialSolarService from "@/assets/service-commercial-solar.png";
+import industrialSolarService from "@/assets/service-industrial-solar.png";
 import residentialProjectImage from "@/assets/project-residential-rooftop.png";
 import hybridInverterProduct from "@/assets/product-hybrid-inverter.png";
 import blogPanelMaintenance from "@/assets/blog-panel-maintenance.png";
 import onGridSolarSystem from "@/assets/on-grid-solar-system.png";
+import offGridSolarSystem from "@/assets/off-grid-solar-system.png";
 import heroSolarRooftopWorker from "@/assets/hero-solar-rooftop-worker.png";
+import indianRuralHouseAfter from "@/assets/indian-rural-house-after.png";
+import industrialSolarPlant from "@/assets/industrial-solar-plant.png";
 
 export const company = {
   name: "SSR Solar Power",
@@ -55,7 +59,6 @@ export const navLinks = [
     children: [
       { label: "PM Surya Ghar Yojana", href: "/subsidy" },
       { label: "Testimonials", href: "/testimonials" },
-      { label: "Gallery", href: "/gallery" },
       { label: "Blog", href: "/blog" },
       { label: "Refer & Earn", href: "/refer-and-earn" },
     ],
@@ -279,7 +282,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Essential checklist before going solar: roof direction, shadow analysis, structural load capacity, wiring route, and sanctioned grid load.",
     date: "12 July 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&q=80",
+    image: residentialProjectImage,
     content: [
       "1. Roof Orientation and Tilt Angle: In India, rooftops with true south-facing orientation receive maximum solar irradiance throughout the year. East and west facing installations can also generate substantial electricity, but tilt angle alignment (typically 15° to 25° depending on latitude) ensures optimal year-round sunlight absorption.",
       "2. Shadow-Free Clearance Audit: Conduct a thorough shadow audit between 9:00 AM and 4:00 PM. Parapet walls, adjacent tall buildings, water storage tanks, staircase rooms, and nearby trees can cast shadows across solar modules, reducing power generation.",
@@ -298,7 +301,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Slab-wise financial assistance, national portal application workflow, eligibility criteria, and approval documentation.",
     date: "28 June 2026",
     readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1000&q=80",
+    image: indianRuralHouseAfter,
     content: [
       "Understanding Central Government Financial Assistance: Residential rooftop solar installations across India may qualify for financial assistance under central government rooftop solar initiatives such as PM Surya Ghar: Muft Bijli Yojana.",
       "Slab-Wise Assistance Structure: Government financial assistance is structured in capacity slabs. Standard assistance rates apply for 1 kW and 2 kW systems, with an incremental benefit for 3 kW plants, providing substantial financial relief for domestic homeowners.",
@@ -330,7 +333,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Comparing cell efficiency, temperature coefficient, degradation rates, and low-light performance of modern PV module technologies.",
     date: "22 May 2026",
     readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1545209463-e2825498edbf?w=1000&q=80",
+    image: onGridSolarSystem,
     content: [
       "Monocrystalline PERC Overview: Mono PERC (Passivated Emitter and Rear Cell) has been the dominant solar cell technology for years, delivering proven module efficiencies of 20% to 21.3% with high structural reliability.",
       "TOPCon (Tunnel Oxide Passivated Contact) Innovation: N-type TOPCon is an advanced cell architecture incorporating an ultra-thin silicon oxide tunnel layer that reduces carrier recombination, elevating module efficiency to 22% and higher.",
@@ -346,7 +349,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Grid-tied solar vs battery backup systems: power outages, net metering, battery costs, and household energy security.",
     date: "14 May 2026",
     readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1000&q=80",
+    image: residentialSolarService,
     content: [
       "On-Grid (Grid-Tied) Solar Systems: On-grid systems connect directly to your local DISCOM power grid. Solar power generated during the day powers home appliances, and surplus energy is exported to the grid via net metering.",
       "Grid Safety & Anti-Islanding: During grid power outages, on-grid inverters automatically shut down within milliseconds (anti-islanding) to protect DISCOM maintenance personnel working on utility lines.",
@@ -362,7 +365,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Realistic unit generation estimates, monthly power bill reduction factors, payback periods, and long-term financial returns.",
     date: "28 April 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1000&q=80",
+    image: offGridSolarSystem,
     content: [
       "Daily and Monthly Unit Generation: Under optimal sunlight, a 3 kW rooftop solar system generates approximately 12 to 14 units (kWh) per day (~360–420 units/month). A 5 kW system generates roughly 20 to 23 units per day (~600–690 units/month).",
       "DISCOM Bill Reduction Impact: Electricity tariffs are billed in slab rates where higher consumption incurs higher per-unit rates. Solar generation offsets these high-tier daytime units, reducing monthly DISCOM bills by 70% to 90%.",
@@ -378,7 +381,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Product manufacturing warranty vs Linear power output warranty, degradation curves, and essential documentation.",
     date: "15 April 2026",
     readTime: "6 min read",
-    image: heroSolarRooftopWorker,
+    image: commercialSolarService,
     content: [
       "Product Warranty vs Performance Warranty: Solar module warranties consist of two separate guarantees: the Product/Workmanship Warranty and the Linear Power Output Warranty.",
       "Product Warranty (10–12 Years): Covers manufacturing defects, structural glass damage, frame joint failures, junction box defects, or bypass diode failures.",
@@ -394,7 +397,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "How bi-directional net meters track imported vs exported solar units, monthly bill adjustments, and DISCOM grid integration.",
     date: "3 April 2026",
     readTime: "7 min read",
-    image: onGridSolarSystem,
+    image: industrialSolarPlant,
     content: [
       "What is a Bi-Directional Net Meter?: A net meter replaces your standard DISCOM electricity meter. It records both electricity imported from the grid and excess solar electricity exported to the grid.",
       "Daytime Generation & Export Flow: During sunny daytime hours, if your rooftop solar system generates more power than your home uses, surplus electricity automatically flows into the DISCOM grid.",
@@ -410,7 +413,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "String inverters vs hybrid inverters, MPPT channels, efficiency ratings, weather protection, and mobile app tracking.",
     date: "18 March 2026",
     readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&q=80",
+    image: heroSolarRooftopWorker,
     content: [
       "The Central Role of Solar Inverters: Solar panels generate DC electricity. The solar inverter converts DC energy into regulated 230V/415V AC electricity suitable for home appliances and grid export.",
       "Matching Inverter kW to Panel Array Wp: Select an inverter whose kW rating and DC voltage window match your solar panel array's cumulative peak capacity.",
@@ -420,6 +423,87 @@ export const blogPosts: BlogPost[] = [
     ]
   }
 ];
+
+export const solarImagesList = [
+  residentialProjectImage,
+  indianRuralHouseAfter,
+  blogPanelMaintenance,
+  onGridSolarSystem,
+  residentialSolarService,
+  offGridSolarSystem,
+  commercialSolarService,
+  industrialSolarPlant,
+  heroSolarRooftopWorker,
+];
+
+/**
+ * Resolves a high-quality, photorealistic solar panel image matching the blog's topic, title, category, or slug.
+ * Always guarantees a distinct, relevant solar panel image and never leaves a blog card blank or broken.
+ */
+export const getRelevantSolarImage = (post?: Partial<BlogPost> | null, fallbackIndex: number = 0): string => {
+  if (!post) return solarImagesList[fallbackIndex % solarImagesList.length];
+
+  const slug = (post.slug || "").toLowerCase();
+  const title = (post.title || "").toLowerCase();
+  const category = (post.category || (post as any).categoryName || "").toLowerCase();
+  const text = `${slug} ${title} ${category} ${post.excerpt || ""}`.toLowerCase();
+
+  // 1. Checklist / 8 Things / Site Survey / Structural Audit
+  if (slug.includes("8-things") || text.includes("checklist") || (text.includes("check") && text.includes("install"))) {
+    return residentialProjectImage;
+  }
+
+  // 2. Government Subsidy / PM Surya Ghar / Policy / Scheme
+  if (slug.includes("subsidy") || text.includes("subsidy") || text.includes("surya ghar") || text.includes("policy") || text.includes("dbt") || text.includes("financial assistance")) {
+    return indianRuralHouseAfter;
+  }
+
+  // 3. Maintenance / Cleaning / Dust / Washing / Inspection
+  if (slug.includes("performing-well") || text.includes("maintenance") || text.includes("clean") || text.includes("wash") || text.includes("dust")) {
+    return blogPanelMaintenance;
+  }
+
+  // 4. TOPCon vs Mono PERC / Cell Technology / Silicon wafer
+  if (slug.includes("topcon") || slug.includes("mono-perc") || text.includes("topcon") || text.includes("mono perc") || text.includes("cell efficiency") || text.includes("bifacial")) {
+    return onGridSolarSystem;
+  }
+
+  // 5. On-Grid vs Hybrid / Battery / Grid-Tied / System Architecture
+  if (slug.includes("on-grid-vs-hybrid") || text.includes("hybrid") || text.includes("grid-tied") || text.includes("architecture") || (text.includes("on-grid") && text.includes("solar"))) {
+    return residentialSolarService;
+  }
+
+  // 6. Savings / 3kW 5kW / Bill Reduction / Payback / Return on Investment
+  if (slug.includes("save") || text.includes("save") || text.includes("3kw") || text.includes("5kw") || text.includes("bill reduction") || text.includes("payback") || text.includes("saving")) {
+    return offGridSolarSystem;
+  }
+
+  // 7. Warranty / Quality / Buyer Protection / Tier-1 Testing
+  if (slug.includes("warranty") || text.includes("warranty") || text.includes("guarantee") || text.includes("tier-1") || text.includes("degradation") || text.includes("defect")) {
+    return commercialSolarService;
+  }
+
+  // 8. Net Metering / Bi-directional / Grid export / DISCOM synchronization
+  if (slug.includes("net-metering") || text.includes("net meter") || text.includes("net-metering") || text.includes("grid policy") || text.includes("export")) {
+    return industrialSolarPlant;
+  }
+
+  // 9. Inverter / Hardware / MPPT / String Inverter
+  if (slug.includes("inverter") || text.includes("inverter") || text.includes("mppt") || text.includes("hardware") || text.includes("conversion")) {
+    return heroSolarRooftopWorker;
+  }
+
+  // If the post has a direct valid local image asset URL (non-unsplash or non-placeholder)
+  if (post.image && typeof post.image === "string" && post.image.length > 5 && !post.image.includes("placeholder") && !post.image.includes("unsplash")) {
+    return post.image;
+  }
+  if ((post as any).featuredImage && typeof (post as any).featuredImage === "string" && (post as any).featuredImage.length > 5 && !(post as any).featuredImage.includes("placeholder") && !(post as any).featuredImage.includes("unsplash")) {
+    return (post as any).featuredImage;
+  }
+
+  // Guaranteed fallback to distinct solar panels image based on index
+  return solarImagesList[fallbackIndex % solarImagesList.length];
+};
 
 export const faqs = [
   {

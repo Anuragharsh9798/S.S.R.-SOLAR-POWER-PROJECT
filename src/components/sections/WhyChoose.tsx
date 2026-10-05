@@ -4,7 +4,7 @@ import { whyChoose } from "@/data/site";
 import { MotionSection } from "@/components/motion";
 
 export const WhyChoose = () => (
-  <MotionSection animation="fadeRight" className="section bg-gradient-soft">
+  <MotionSection animation="fadeRight" className="section py-10 md:py-14 bg-gradient-soft">
     <div className="container-wide">
       <SectionHeading
         eyebrow="Why SSR Solar Power"
@@ -12,7 +12,7 @@ export const WhyChoose = () => (
         description="Everything that makes a solar investment safe, bankable and genuinely low-maintenance."
       />
 
-      <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 md:mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {whyChoose.map(({ icon: Icon, title, description }, i) => (
           <motion.article
             key={title}

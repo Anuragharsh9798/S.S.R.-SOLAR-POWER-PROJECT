@@ -72,7 +72,7 @@ const timelineSteps = [
   },
 ];
 
-export const InstallationProcess = () => {
+export const InstallationProcess = ({ className = "" }: { className?: string } = {}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -82,7 +82,7 @@ export const InstallationProcess = () => {
   const scaleY = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
   return (
-    <MotionSection animation="fadeRight" className="section relative overflow-hidden">
+    <MotionSection animation="fadeRight" className={`section relative overflow-hidden py-10 md:py-14 ${className}`}>
       <div className="container-wide">
         <SectionHeading
           eyebrow="Installation Timeline"
@@ -90,7 +90,7 @@ export const InstallationProcess = () => {
           description="From initial roof survey to your system turning live — transparent execution at every step."
         />
 
-        <div ref={containerRef} className="relative mt-20 max-w-5xl mx-auto">
+        <div ref={containerRef} className="relative mt-8 md:mt-10 max-w-5xl mx-auto">
           {/* Scroll-Driven Animated Vertical Progress Bar */}
           <div className="absolute left-6 top-4 bottom-4 w-1 bg-border/60 md:left-1/2 md:-ml-0.5 rounded-full overflow-hidden" aria-hidden>
             <motion.div
@@ -99,7 +99,7 @@ export const InstallationProcess = () => {
             />
           </div>
 
-          <div className="space-y-12 md:space-y-16">
+          <div className="space-y-8 md:space-y-10">
             {timelineSteps.map((s, i) => {
               const Icon = s.icon;
               const isEven = i % 2 === 0;
@@ -169,7 +169,7 @@ export const InstallationProcess = () => {
 };
 
 export const SubsidyTimeline = () => (
-  <MotionSection animation="fadeLeft" className="section bg-gradient-soft">
+  <MotionSection animation="fadeLeft" className="section py-10 md:py-14 bg-gradient-soft">
     <div className="container-wide">
       <SectionHeading
         eyebrow="Government Subsidy"
@@ -177,7 +177,7 @@ export const SubsidyTimeline = () => (
         description="We manage the entire national portal journey so your claim is approved without back-and-forth."
       />
 
-      <ol className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <ol className="mt-8 md:mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {subsidySteps.map((s, i) => {
           const Icon = subsidyIcons[i];
           return (
@@ -190,11 +190,11 @@ export const SubsidyTimeline = () => (
               whileHover={{ y: -6 }}
               className="group timeline-card-glow relative transition-all duration-500"
             >
-              <div className="relative h-full w-full overflow-hidden p-7 rounded-3xl transition-all duration-500 timeline-card-gradient-border">
+              <div className="relative h-full w-full overflow-hidden p-6 md:p-7 rounded-3xl transition-all duration-500 timeline-card-gradient-border">
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/20">
                   <Icon className="h-5 w-5 text-secondary-foreground dark:text-secondary" />
                 </span>
-                <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">Step {i + 1}</p>
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-primary">Step {i + 1}</p>
                 <h3 className="mt-1.5 text-lg font-semibold">{s.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
               </div>
@@ -203,7 +203,7 @@ export const SubsidyTimeline = () => (
         })}
       </ol>
 
-      <div className="mt-12 text-center">
+      <div className="mt-7 md:mt-8 text-center">
         <Button asChild size="lg" className="btn-premium h-12 rounded-full bg-gradient-brand px-8 font-semibold text-primary-foreground shadow-glow">
           <Link to="/calculator">Apply Now</Link>
         </Button>

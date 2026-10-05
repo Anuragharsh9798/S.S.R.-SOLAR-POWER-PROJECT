@@ -133,14 +133,22 @@ describe('Admin Authentication & RBAC (e2e)', () => {
     expect(adminRes.body.message).toContain('Access granted to Admin Dashboard');
   });
 
-  it('5. GET /api/v1/admin/dashboard - Should DENY access (403 Forbidden) to STAFF role', async () => {
+  it('5. GET /api/v1/admin/dashboard - Should GRANT view access (200 OK) to STAFF role', async () => {
     const staffRes = await request(app.getHttpServer())
       .get('/api/v1/admin/dashboard')
       .set('Cookie', staffCookie)
       .set('Authorization', `Bearer ${staffToken}`);
 
-    expect(staffRes.status).toBe(403);
-    expect(staffRes.body.message).toContain('Access denied');
+    expect(staffRes.status).toBe(200);
+  });
+
+  it('5b. GET /api/v1/admin/settings - Should DENY access (403 Forbidden) to STAFF role', async () => {
+    const staffSettingsRes = await request(app.getHttpServer())
+      .get('/api/v1/admin/settings')
+      .set('Cookie', staffCookie)
+      .set('Authorization', `Bearer ${staffToken}`);
+
+    expect(staffSettingsRes.status).toBe(403);
   });
 
   it('6. POST /api/v1/auth/logout - Should clear access_token cookie', async () => {

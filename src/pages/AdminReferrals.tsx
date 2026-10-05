@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Layout } from "@/components/Layout";
 import { Seo } from "@/components/Seo";
 import { SectionHeading } from "@/components/SectionHeading";
 import { MotionSection } from "@/components/motion";
@@ -22,7 +21,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  DollarSign,
   Eye,
   EyeOff,
   RefreshCw,
@@ -133,6 +131,18 @@ export const AdminReferrals = () => {
     }
   };
 
+  const getPortalLabel = (role?: string | null) => {
+    switch (role) {
+      case "SUPER_ADMIN":
+        return "Super Admin Portal";
+      case "STAFF":
+        return "Staff Portal";
+      case "ADMIN":
+      default:
+        return "Admin Portal";
+    }
+  };
+
   // Referral data state
   const [referrals, setReferrals] = useState<ReferralClaim[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -175,6 +185,9 @@ export const AdminReferrals = () => {
         if (userRole === "SUPER_ADMIN" || userRole === "ADMIN" || userRole === "STAFF") {
           setIsAuthenticated(true);
           setAdminUser(profile.user);
+          if (userRole === "SUPER_ADMIN" || userRole === "ADMIN" || userRole === "STAFF") {
+            setSelectedRole(userRole);
+          }
           await loadReferrals();
         } else {
           setIsAuthenticated(false);
@@ -213,33 +226,27 @@ export const AdminReferrals = () => {
     setError(null);
 
     try {
-      const res = await api.post<{ user: any }>("/api/v1/auth/login", {
+      const res = await api.post<{ user: any; token?: string }>("/api/v1/auth/login", {
         email: loginEmail,
         password: loginPassword,
       });
 
       if (res && res.user) {
-        const actualRole = res.user.role || res.user.roleName;
-
-        // Verify backend authenticated role matches selected role
-        if (actualRole !== selectedRole) {
-          try { await api.post("/api/v1/auth/logout"); } catch {}
-          setIsAuthenticated(false);
-          setAdminUser(null);
-          const mismatchMsg = "Selected role does not match this account.";
-          setError(mismatchMsg);
-          toast.error("Role Mismatch", { description: mismatchMsg });
-          return;
+        if (res.token) {
+          api.setToken(res.token);
         }
+        const actualRole = res.user.role || res.user.roleName;
 
         if (actualRole === "SUPER_ADMIN" || actualRole === "ADMIN" || actualRole === "STAFF") {
           setIsAuthenticated(true);
           setAdminUser(res.user);
+          setSelectedRole(actualRole);
           toast.success("Authentication Successful", {
             description: `Welcome back, ${res.user.fullName || res.user.email} (${actualRole})`,
           });
           await loadReferrals();
         } else {
+          api.setToken(null);
           setIsAuthenticated(false);
           setError("Access Denied: Account lacks required administrative privileges.");
           toast.error("Access Denied", {
@@ -258,15 +265,17 @@ export const AdminReferrals = () => {
   };
 
   const handleLogout = async () => {
+    const prevRole = currentUserRole;
     try {
       await api.post("/api/v1/auth/logout");
     } catch {
       // Ignore logout errors
     } finally {
+      api.setToken(null);
       setIsAuthenticated(false);
       setAdminUser(null);
       setReferrals([]);
-      toast.info("Logged out of Admin Portal");
+      toast.info(`Logged out of ${getPortalLabel(prevRole)}`);
     }
   };
 
@@ -399,7 +408,7 @@ export const AdminReferrals = () => {
       case "PAID":
         return (
           <Badge className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 hover:bg-emerald-500/20 font-bold px-2.5 py-0.5">
-            <DollarSign className="w-3 h-3 mr-1" /> PAID
+            <IndianRupee className="w-3 h-3 mr-1" /> PAID
           </Badge>
         );
       default:
@@ -407,21 +416,22 @@ export const AdminReferrals = () => {
     }
   };
 
+  const activePortalRole = isAuthenticated ? currentUserRole : selectedRole;
+
   return (
-    <Layout>
+    <div className="space-y-6">
       <Seo
-        title="Admin Referral Claims Management | SSR Solar Power"
+        title={`${getPortalLabel(activePortalRole)} | Referral Claims Management | SSR Solar Power`}
         description="Administrative portal for reviewing, approving, rejecting, and disbursing SSR Solar referral rewards."
         path="/admin/referrals"
       />
 
-      <section className="relative min-h-[85vh] pb-16 pt-28 md:pb-24 md:pt-36">
-        <div className="container-wide">
+      <div className="space-y-6">
           {/* Header */}
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border/60 pb-6">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-                <ShieldCheck className="h-4 w-4" /> Admin Portal
+                <ShieldCheck className="h-4 w-4" /> {getPortalLabel(activePortalRole)}
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
                 Referral Claims Management
@@ -569,7 +579,7 @@ export const AdminReferrals = () => {
                         <Loader2 className="h-4 w-4 animate-spin" /> Authenticating...
                       </span>
                     ) : (
-                      "Sign In to Admin Portal"
+                      `Sign In to ${getPortalLabel(selectedRole)}`
                     )}
                   </Button>
                 </form>
@@ -611,7 +621,7 @@ export const AdminReferrals = () => {
                 <div className="calc-card-gradient-border rounded-2xl bg-card p-5 shadow-soft">
                   <div className="flex items-center justify-between text-xs font-semibold text-emerald-600">
                     <span>Total Disbursed</span>
-                    <DollarSign className="h-4 w-4 text-emerald-500" />
+                    <IndianRupee className="h-4 w-4 text-emerald-500" />
                   </div>
                   <div className="mt-2 text-2xl font-black text-emerald-600">
                     ₹{totalPaidAmount.toLocaleString("en-IN")}
@@ -809,8 +819,7 @@ export const AdminReferrals = () => {
               </div>
             </div>
           )}
-        </div>
-      </section>
+      </div>
 
       {/* VIEW DETAILS DIALOG */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
@@ -1030,7 +1039,7 @@ export const AdminReferrals = () => {
         <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2 text-primary">
-              <DollarSign className="h-5 w-5 text-emerald-500" /> Mark Reward as Paid
+              <IndianRupee className="h-5 w-5 text-emerald-500" /> Mark Reward as Paid
             </DialogTitle>
             <DialogDescription className="text-xs">
               Disburse reward of {formatRewardAmount(markPaidTarget?.rewardAmount)} for claim #{markPaidTarget?.claimNumber}
@@ -1075,7 +1084,7 @@ export const AdminReferrals = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </div>
   );
 };
 

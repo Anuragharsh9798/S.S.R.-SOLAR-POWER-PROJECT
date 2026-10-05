@@ -87,15 +87,15 @@ export const ProductCard = ({ product, index = 0 }: { product: (typeof products)
   );
 };
 
-export const FeaturedProducts = () => (
-  <MotionSection animation="zoomIn" className="section bg-gradient-soft">
+export const FeaturedProducts = ({ className = "" }: { className?: string } = {}) => (
+  <MotionSection animation="zoomIn" className={`section py-10 md:py-14 bg-gradient-soft ${className}`}>
     <div className="container-wide">
       <SectionHeading
         eyebrow="Featured Products"
         title={<>Tier-1 hardware, <span className="text-gradient">honestly specified</span></>}
         description="Every component we install is field-proven, warranty-backed and matched to your generation target."
       />
-      <div className="mt-14 grid gap-7 md:grid-cols-2 mx-auto max-w-3xl">
+      <div className="mt-8 md:mt-10 grid gap-6 md:grid-cols-2 mx-auto max-w-3xl">
         {products.map((p, i) => (
           <ProductCard key={p.slug} product={p} index={i} />
         ))}

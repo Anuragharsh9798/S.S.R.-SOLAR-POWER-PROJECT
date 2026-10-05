@@ -46,12 +46,13 @@ const Blog = () => {
       />
       <PageHero
         eyebrow="Blog"
-        title="Solar insights worth your time"
-        description="Guides written by our engineers — no marketing fluff, just what actually affects your generation and returns."
-        image="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1920&q=80"
+        title="Solar Insights & Practical Guides"
+        className="pb-10 md:pb-14"
+        description="Welcome to the SSR Solar Power blog, your comprehensive resource for practical solar energy knowledge. Discover insightful guides on residential and commercial rooftop solar, on-grid and hybrid power systems, system sizing, routine maintenance, and long-term electricity bill savings. We also provide timely updates on government initiatives like PM Surya Ghar Muft Bijli Yojana, state subsidies, DISCOM net metering guidelines, and reliable solar technology practices to help property owners make informed, cost-effective decisions."
+        image="https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=1920&q=80"
       />
 
-      <section className="section pt-0">
+      <section className="section pt-0 pb-10 md:pb-14">
         <div className="container-wide space-y-8">
           {error && (
             <div className="mx-auto max-w-lg flex items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive">

@@ -3,8 +3,8 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { MotionSection } from "@/components/motion";
 
-export const FaqSection = ({ heading = true }: { heading?: boolean }) => (
-  <MotionSection animation="fadeRight" className="section">
+export const FaqSection = ({ heading = true, className = "" }: { heading?: boolean; className?: string }) => (
+  <MotionSection animation="fadeRight" className={`section py-10 md:py-14 ${className}`}>
     <div className="container-narrow">
       {heading && (
         <SectionHeading
@@ -14,7 +14,7 @@ export const FaqSection = ({ heading = true }: { heading?: boolean }) => (
         />
       )}
 
-      <Accordion type="single" collapsible className="mt-12 space-y-3">
+      <Accordion type="single" collapsible className="mt-7 md:mt-8 space-y-3">
         {faqs.map((f, i) => (
           <AccordionItem
             key={f.q}

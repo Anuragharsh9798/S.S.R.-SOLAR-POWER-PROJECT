@@ -101,21 +101,19 @@ export const Footer = () => (
             </div>
           </div>
 
-          {/* Embedded Google Map Container */}
+          {/* Embedded OpenStreetMap Container */}
           <div className="mt-4 overflow-hidden rounded-2xl border border-border/80 shadow-soft h-32 relative group/map">
             <iframe
               title="SSR Solar Power Location Map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d57545.92211566838!2d83.52355480572833!3d25.945899983173775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3991f868ad1104e7%3A0x6335198032c25bc!2sMau%2C%20Uttar%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=83.5135%2C25.9358%2C83.5335%2C25.9558&layer=mapnik&marker=25.9459%2C83.5235"
               width="100%"
               height="100%"
-              style={{ border: 0, filter: "grayscale(0.5) opacity(0.85)" }}
-              allowFullScreen
+              style={{ border: 0, filter: "grayscale(0.3) opacity(0.9)" }}
               loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="transition-all duration-500 group-hover/map:scale-105 group-hover/map:filter-none"
+              className="w-full h-full transition-all duration-500 group-hover/map:scale-105 group-hover/map:filter-none"
             />
             <a
-              href="https://maps.google.com/?q=Kutubpur,+Bahadurpur,+Mau,+Uttar+Pradesh+221602"
+              href="https://www.openstreetmap.org/?mlat=25.9459&mlon=83.5235#map=16/25.9459/83.5235"
               target="_blank"
               rel="noopener noreferrer"
               className="absolute bottom-2 right-2 rounded-full bg-black/75 px-3 py-1 text-[10px] font-bold text-white backdrop-blur hover:bg-primary hover:text-slate-950 transition-all flex items-center gap-1 shadow-md"

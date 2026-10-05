@@ -164,7 +164,7 @@ const CountUpValue = ({
 
 import { api } from "@/lib/api";
 
-export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
+export const SolarCalculator = ({ heading = true, className = "" }: { heading?: boolean; className?: string }) => {
   const [billStr, setBillStr] = useState("6000");
   const [unitsStr, setUnitsStr] = useState("750");
   const [rateStr, setRateStr] = useState("8.0");
@@ -378,8 +378,8 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
       </div>
 
       {/* Main Interactive Calculator Section */}
-      <MotionSection animation="fadeLeft" className="section bg-gradient-soft print:hidden">
-        <div className="container-wide space-y-10">
+      <MotionSection animation="fadeLeft" className={`section bg-gradient-soft print:hidden py-10 md:py-14 ${className}`}>
+        <div className="container-wide space-y-7 md:space-y-8">
           {heading && (
             <SectionHeading
               eyebrow="Solar Savings Calculator"
@@ -389,7 +389,7 @@ export const SolarCalculator = ({ heading = true }: { heading?: boolean }) => {
           )}
 
           {/* Section 1: Calculator Input + Results Section */}
-          <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)]">
+          <div className="grid items-start gap-6 md:gap-7 xl:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)]">
             {/* Calculator Input Form */}
             <motion.form
               initial={{ opacity: 0, y: 24 }}

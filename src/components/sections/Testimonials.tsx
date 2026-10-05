@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,6 +18,10 @@ import {
   Home,
   Zap,
   ArrowRight,
+  Quote,
+  ShieldCheck,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { testimonials, TestimonialItem } from "@/data/site";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -33,23 +37,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-
+import { toast } from "sonner";
 import { api } from "@/lib/api";
 
 interface TestimonialsProps {
   isHomePage?: boolean;
+  className?: string;
 }
 
-export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
+export const Testimonials = ({ isHomePage = false, className = "" }: TestimonialsProps) => {
   const [items, setItems] = useState<TestimonialItem[]>(testimonials);
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(1200);
 
   // Review Form Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    location: "Mau, Uttar Pradesh",
+    location: "",
     rating: 0, // Unselected by default (0 stars)
     quote: "",
     systemType: "",
@@ -66,6 +72,16 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const [moderationNotice, setModerationNotice] = useState<string | null>(null);
+
+  // Track viewport width for responsive card deck calculations
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Fetch approved reviews from backend API on mount
   useEffect(() => {
@@ -110,16 +126,19 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
     };
   }, [isModalOpen]);
 
+  // Subtle auto-advance every 6.5 seconds (pauses on user hover or modal open)
   useEffect(() => {
     if (isPaused || isModalOpen) return;
-    const t = setInterval(() => {
-      setIndex((i) => (i + 1) % Math.max(1, total));
-    }, 5000);
-    return () => clearInterval(t);
-  }, [isPaused, isModalOpen, total]);
 
-  const go = (dir: number) => {
-    setIndex((i) => (i + dir + total) % total);
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % total);
+    }, 6500);
+
+    return () => clearInterval(timer);
+  }, [total, isPaused, isModalOpen]);
+
+  const go = (step: number) => {
+    setIndex((prev) => (prev + step + total) % total);
   };
 
   const getCardOffset = (cardIdx: number, activeIdx: number, count: number) => {
@@ -129,10 +148,83 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
     return diff;
   };
 
+  // Smooth, refined layered-deck 3D calculations
+  const getDeckStyles = (diff: number, width: number) => {
+    const isMobile = width < 640;
+    const isTablet = width >= 640 && width < 1024;
+
+    if (diff === 0) {
+      // MAIN ACTIVE FRONT CARD: Highest visual focus, fully readable
+      return {
+        x: "0%",
+        y: 0,
+        scale: 1,
+        opacity: 1,
+        rotate: 0,
+        zIndex: 30,
+        filter: "brightness(1) blur(0px)",
+        pointerEvents: "auto" as const,
+        isCenter: true,
+      };
+    } else if (diff === -1) {
+      // LEFT BACKGROUND CARD: Layered behind with subtle offset and soft opacity
+      return {
+        x: isMobile ? "-14%" : isTablet ? "-22%" : "-28%",
+        y: isMobile ? 8 : 12,
+        scale: isMobile ? 0.9 : 0.88,
+        opacity: isMobile ? 0.28 : 0.45,
+        rotate: isMobile ? -1.5 : -3,
+        zIndex: 15,
+        filter: "brightness(0.72) blur(1.5px)",
+        pointerEvents: "auto" as const,
+        isCenter: false,
+      };
+    } else if (diff === 1) {
+      // RIGHT BACKGROUND CARD: Layered behind with subtle offset and soft opacity
+      return {
+        x: isMobile ? "14%" : isTablet ? "22%" : "28%",
+        y: isMobile ? 8 : 12,
+        scale: isMobile ? 0.9 : 0.88,
+        opacity: isMobile ? 0.28 : 0.45,
+        rotate: isMobile ? 1.5 : 3,
+        zIndex: 15,
+        filter: "brightness(0.72) blur(1.5px)",
+        pointerEvents: "auto" as const,
+        isCenter: false,
+      };
+    } else if (diff < -1) {
+      // FAR LEFT TRANSITION (Hidden cleanly)
+      return {
+        x: isMobile ? "-35%" : "-52%",
+        y: 20,
+        scale: 0.76,
+        opacity: 0,
+        rotate: -6,
+        zIndex: 0,
+        filter: "brightness(0.5) blur(3px)",
+        pointerEvents: "none" as const,
+        isCenter: false,
+      };
+    } else {
+      // FAR RIGHT TRANSITION (Hidden cleanly)
+      return {
+        x: isMobile ? "35%" : "52%",
+        y: 20,
+        scale: 0.76,
+        opacity: 0,
+        rotate: 6,
+        zIndex: 0,
+        filter: "brightness(0.5) blur(3px)",
+        pointerEvents: "none" as const,
+        isCenter: false,
+      };
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: "",
-      location: "Mau, Uttar Pradesh",
+      location: "",
       rating: 0,
       quote: "",
       systemType: "",
@@ -148,12 +240,42 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
     setModerationNotice(null);
   };
 
+  const handleRatingSelect = (star: number) => {
+    setFormData((prev) => ({ ...prev, rating: star }));
+  };
+
+  const handleAspectToggle = (aspect: string) => {
+    setFormData((prev) => {
+      const exists = prev.likedAspects.includes(aspect);
+      return {
+        ...prev,
+        likedAspects: exists
+          ? prev.likedAspects.filter((a) => a !== aspect)
+          : [...prev.likedAspects, aspect],
+      };
+    });
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArr = Array.from(e.target.files).slice(0, 3);
+      setFormData((prev) => ({ ...prev, photos: [...prev.photos, ...filesArr].slice(0, 3) }));
+    }
+  };
+
+  const removePhoto = (idx: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== idx),
+    }));
+  };
+
   // Form submission handler -> POST /api/v1/reviews
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.rating === 0 || formData.rating < 1 || formData.rating > 5) {
-      toast.error("Please select a rating (1 to 5 stars) before submitting.");
+    if (formData.rating === 0) {
+      toast.error("Please tap a star rating (1 to 5 stars) before submitting.");
       return;
     }
 
@@ -173,6 +295,9 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
       quote: formData.quote.trim(),
       solarType: formData.systemType || undefined,
       installType: formData.installType || undefined,
+      performance: formData.performance || undefined,
+      experience: formData.experience || undefined,
+      likedAspects: formData.likedAspects.length > 0 ? formData.likedAspects : undefined,
     };
 
     try {
@@ -202,10 +327,10 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
   };
 
   return (
-    <MotionSection animation="fadeRight" className="section relative overflow-hidden py-20">
-      {/* Background Glow */}
-      <div aria-hidden className="blob -left-20 top-1/3 h-80 w-80 bg-primary/10" />
-      <div aria-hidden className="blob -right-20 bottom-10 h-80 w-80 bg-emerald-500/10" />
+    <MotionSection animation="fadeRight" className={`section relative overflow-hidden py-10 md:py-14 bg-background/50 ${className}`}>
+      {/* Subtle Background Glows */}
+      <div aria-hidden className="blob -left-24 top-1/4 h-80 w-80 bg-primary/10" />
+      <div aria-hidden className="blob -right-24 bottom-12 h-80 w-80 bg-emerald-500/10" />
 
       <div className="container-wide relative z-10">
         <SectionHeading
@@ -215,241 +340,154 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
               What our customers <span className="text-gradient">actually say</span>
             </>
           }
-          description="Trusted by homeowners and businesses for reliable solar solutions, quality installation and dependable support."
+          description="Real rooftop and commercial solar installation experiences from verified property owners across Uttar Pradesh."
         />
 
-        {isHomePage ? (
-          /* COMPACT HOME PAGE PREVIEW: 3 FEATURED REVIEWS ONLY */
-          <div className="mt-12 space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {items.slice(0, 3).map((item, idx) => (
+        {/* STACKED LAYERED-CARD TESTIMONIAL CAROUSEL DECK */}
+        <div
+          className="relative mx-auto mt-8 md:mt-10 max-w-5xl flex flex-col items-center"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* Deck Stage Container with Preserved Height */}
+          <div className="relative w-full h-[390px] sm:h-[370px] md:h-[350px] flex items-center justify-center px-4 overflow-hidden py-4">
+            {items.map((item, i) => {
+              const diff = getCardOffset(i, index, total);
+              const layer = getDeckStyles(diff, viewportWidth);
+
+              return (
                 <motion.div
-                  key={`${item.name}-${idx}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: idx * 0.1 }}
-                  className="group relative flex flex-col justify-between p-6 sm:p-7 rounded-3xl border border-border/80 bg-card/95 backdrop-blur-xl shadow-soft hover:border-emerald-500/50 hover:shadow-[0_12px_35px_rgba(16,185,129,0.18)] transition-all duration-300"
+                  key={`${item.name}-${i}`}
+                  initial={false}
+                  animate={{
+                    x: layer.x,
+                    y: layer.y,
+                    scale: layer.scale,
+                    opacity: layer.opacity,
+                    rotate: layer.rotate,
+                    zIndex: layer.zIndex,
+                    filter: layer.filter,
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  onClick={() => {
+                    if (diff === -1) go(-1);
+                    if (diff === 1) go(1);
+                  }}
+                  style={{
+                    pointerEvents: layer.pointerEvents,
+                  }}
+                  className={`absolute w-[92%] sm:w-[84%] md:w-[640px] lg:w-[680px] max-w-[680px] select-none ${
+                    layer.isCenter
+                      ? "cursor-default"
+                      : "cursor-pointer hover:opacity-75 transition-opacity"
+                  }`}
                 >
-                  <div>
-                    <div className="flex items-center gap-1 mb-3.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < item.rating
-                              ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]"
-                              : "fill-muted/40 text-muted-foreground/30"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <blockquote className="text-sm text-foreground/90 font-medium leading-relaxed italic line-clamp-4">
-                      &ldquo;{item.quote}&rdquo;
-                    </blockquote>
-                  </div>
-                  <div className="mt-6 pt-4 border-t border-border/50 flex flex-col space-y-1">
-                    <h4 className="font-display font-bold text-base text-foreground">{item.name}</h4>
-                    <p className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                      <span>📍 {item.location}</span>
-                    </p>
-                  </div>
+                  <TestimonialCardDeckItem item={item} isFront={layer.isCenter} />
                 </motion.div>
-              ))}
+              );
+            })}
+          </div>
+
+          {/* Navigation Controls: Previous / Next Buttons & Active Progress Pill */}
+          <div className="mt-6 md:mt-7 flex flex-wrap items-center justify-between w-full max-w-xl gap-4 px-4 z-30">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => go(-1)}
+              aria-label="Previous review"
+              className="flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground shadow-soft hover:border-primary/50 hover:text-primary transition-all backdrop-blur-md cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </motion.button>
+
+            {/* Pagination Count & Progress Dots */}
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs font-bold text-muted-foreground tracking-wider">
+                0{index + 1} <span className="text-muted-foreground/40">/</span> 0{total}
+              </span>
+              <div className="flex items-center gap-1.5">
+                {items.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setIndex(i)}
+                    aria-label={`Go to testimonial ${i + 1}`}
+                    className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                      i === index
+                        ? "w-6 bg-gradient-brand shadow-glow"
+                        : "w-2 bg-border hover:bg-muted-foreground/50"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
 
-            {/* DUAL ACTION BUTTONS: VIEW ALL REVIEWS & SHARE YOUR REVIEW */}
-            <div className="flex flex-wrap items-center justify-center gap-4 z-20 pt-2">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => go(1)}
+              aria-label="Next review"
+              className="flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground shadow-soft hover:border-primary/50 hover:text-primary transition-all backdrop-blur-md cursor-pointer"
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </motion.button>
+          </div>
+
+          {/* Action Row: Write a Review CTA (+ View All Reviews on Homepage) */}
+          <div className="mt-5 md:mt-6 flex flex-wrap items-center justify-center gap-4 text-center z-30">
+            {isHomePage && (
               <Link to="/testimonials">
                 <Button
                   variant="outline"
-                  className="rounded-full px-6 h-12 text-sm font-semibold border-primary/50 text-foreground hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2"
+                  className="rounded-full px-6 h-11 text-sm font-semibold border-primary/50 text-foreground hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2 cursor-pointer"
                 >
                   View All Reviews ({items.length}) <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
+            )}
+
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Button
                 onClick={() => {
                   resetForm();
                   setIsModalOpen(true);
                 }}
-                className="btn-premium rounded-full bg-gradient-brand px-6 h-12 text-sm font-bold text-primary-foreground shadow-glow flex items-center gap-2"
+                className="btn-premium btn-gold-shine rounded-full px-7 h-11 text-sm sm:text-base font-bold text-primary-foreground shadow-glow flex items-center gap-2.5 mx-auto cursor-pointer"
               >
-                <PenSquare className="h-4 w-4" /> Share Your Review
+                <PenSquare className="h-4 w-4" /> Write a Review
               </Button>
-            </div>
+            </motion.div>
           </div>
-        ) : (
-          /* FULL TESTIMONIALS PAGE: INTERACTIVE 3D CAROUSEL BROWSER FOR ALL REVIEWS */
-          <div
-            className="relative mx-auto mt-14 max-w-5xl flex flex-col items-center"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-          >
-            {/* 3D Stacked Testimonial Cards Container */}
-            <div className="relative w-full h-[370px] sm:h-[350px] md:h-[330px] flex items-center justify-center px-4 overflow-hidden py-4">
-              {items.map((item, i) => {
-                const diff = getCardOffset(i, index, total);
-                const isCenter = diff === 0;
-
-                // Compute 3D position & depth effect values
-                let x = "0%";
-                let y = 0;
-                let scale = 1;
-                let opacity = 1;
-                let rotate = 0;
-                let zIndex = 30;
-                let filter = "brightness(1) blur(0px)";
-
-                if (diff === 0) {
-                  x = "0%";
-                  y = -6;
-                  scale = 1;
-                  opacity = 1;
-                  rotate = 0;
-                  zIndex = 30;
-                  filter = "brightness(1) blur(0px)";
-                } else if (diff === -1) {
-                  x = "-30%";
-                  y = 4;
-                  scale = 0.84;
-                  opacity = 0.38;
-                  rotate = -5;
-                  zIndex = 10;
-                  filter = "brightness(0.65) blur(1.5px)";
-                } else if (diff === 1) {
-                  x = "30%";
-                  y = 4;
-                  scale = 0.84;
-                  opacity = 0.38;
-                  rotate = 5;
-                  zIndex = 10;
-                  filter = "brightness(0.65) blur(1.5px)";
-                } else if (diff < -1) {
-                  x = "-60%";
-                  y = 10;
-                  scale = 0.7;
-                  opacity = 0;
-                  rotate = -10;
-                  zIndex = 0;
-                  filter = "brightness(0.5) blur(3px)";
-                } else {
-                  x = "60%";
-                  y = 10;
-                  scale = 0.7;
-                  opacity = 0;
-                  rotate = 10;
-                  zIndex = 0;
-                  filter = "brightness(0.5) blur(3px)";
-                }
-
-                return (
-                  <motion.div
-                    key={`${item.name}-${i}`}
-                    initial={false}
-                    animate={{ x, y, scale, opacity, rotate, zIndex, filter }}
-                    transition={{
-                      duration: 0.7,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    onClick={() => {
-                      if (diff === -1) go(-1);
-                      if (diff === 1) go(1);
-                    }}
-                    className={`absolute w-full sm:w-[85%] md:w-[660px] select-none ${
-                      isCenter ? "" : "cursor-pointer hidden sm:block"
-                    } ${Math.abs(diff) > 1 ? "pointer-events-none" : ""}`}
-                  >
-                    <TestimonialCardItem item={item} isCenter={isCenter} />
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Navigation Controls & Carousel Progress */}
-            <div className="mt-10 flex flex-wrap items-center justify-between w-full max-w-xl gap-4 px-4 z-20">
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => go(-1)}
-                aria-label="Previous review"
-                className="flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground shadow-soft hover:border-primary/50 hover:text-primary transition-all"
-              >
-                <ChevronLeft className="h-4 w-4" /> Previous
-              </motion.button>
-
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs font-bold text-muted-foreground tracking-wider">
-                  0{index + 1} <span className="text-muted-foreground/40">/</span> 0{total}
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {items.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setIndex(i)}
-                      aria-label={`Go to testimonial ${i + 1}`}
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        i === index ? "w-6 bg-gradient-brand shadow-glow" : "w-2 bg-border hover:bg-muted-foreground/50"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => go(1)}
-                aria-label="Next review"
-                className="flex items-center gap-2 rounded-full border border-border/80 bg-card/90 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground shadow-soft hover:border-primary/50 hover:text-primary transition-all"
-              >
-                Next <ChevronRight className="h-4 w-4" />
-              </motion.button>
-            </div>
-
-            {/* Prominent Write / Submit Review CTA Button */}
-            <div className="mt-8 pt-2 text-center z-20">
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  onClick={() => {
-                    resetForm();
-                    setIsModalOpen(true);
-                  }}
-                  className="btn-premium rounded-full bg-gradient-brand px-8 h-13 text-sm sm:text-base font-bold text-primary-foreground shadow-glow flex items-center gap-2.5 mx-auto"
-                >
-                  <PenSquare className="h-4 w-4" /> Write a Review
-                </Button>
-              </motion.div>
-              <p className="text-xs text-muted-foreground mt-2.5">
-                Have you installed SSR Solar Power in UP? Share your experience with our team.
-              </p>
-            </div>
-          </div>
-        )}
+          <p className="text-xs text-muted-foreground mt-2.5 text-center">
+            Installed rooftop or commercial solar with SSR Solar Power in UP? Share your review.
+          </p>
+        </div>
       </div>
 
       {/* GOOGLE MAPS STYLE PROGRESSIVE REVIEW MODAL FORM */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[9999] w-[92vw] sm:max-w-[540px] max-h-[85vh] flex flex-col rounded-3xl border-slate-800 bg-slate-950 text-white p-0 shadow-2xl backdrop-blur-2xl overflow-hidden [overscroll-behavior:contain]">
-          {/* Pinned Visible Header */}
+        <DialogContent className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[9999] w-[94vw] sm:max-w-[540px] max-h-[90vh] flex flex-col rounded-3xl border-slate-800 bg-slate-950 text-white p-0 gap-0 shadow-2xl backdrop-blur-2xl overflow-hidden [overscroll-behavior:contain]">
+          {/* Pinned Header */}
           <div className="shrink-0 p-5 sm:p-6 pb-4 border-b border-slate-800/80 bg-slate-950 z-20">
             <DialogHeader className="space-y-1 text-left">
               <DialogTitle className="text-xl font-bold flex items-center gap-2 text-white">
                 <Sparkles className="h-5 w-5 text-amber-400" /> Share Your Review
               </DialogTitle>
               <DialogDescription className="text-xs text-slate-400">
-                Rate your SSR Solar Power experience in UP. Your rating opens quick feedback chips.
+                Rate your SSR Solar Power experience in UP. Your rating unlocks quick feedback options.
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          {/* Internal Scrollable Content Body with Wheel Event Stop Propagation */}
+          {/* Internal Scrollable Content Body */}
           <div
             onWheel={(e) => e.stopPropagation()}
-            className="p-5 sm:p-6 overflow-y-auto flex-1 max-h-[85vh] [overscroll-behavior:contain] text-white"
+            className="p-5 sm:p-6 overflow-y-auto flex-1 min-h-0 [overscroll-behavior:contain] text-white"
           >
             {submitSuccess ? (
               <div className="py-8 text-center space-y-3 bg-emerald-950/30 rounded-2xl border border-emerald-500/40 p-5">
@@ -491,27 +529,14 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                     id="review-location"
                     type="text"
                     required
-                    placeholder="e.g., Mau / Ballia / Azamgarh / Belthara Road"
+                    placeholder="e.g., Mau, Lucknow, Varanasi, Azamgarh, etc."
                     value={formData.location}
                     onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
                     className="rounded-xl border-slate-800 bg-slate-900/90 text-white text-sm focus:border-emerald-500"
                   />
-                  {/* Location Quick Presets */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {["Mau", "Ballia", "Kutubpur", "Azamgarh", "Gopalpur", "Belthara Road", "Konauli"].map((loc) => (
-                      <button
-                        key={loc}
-                        type="button"
-                        onClick={() => setFormData((prev) => ({ ...prev, location: `${loc}, Uttar Pradesh` }))}
-                        className="rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-semibold text-slate-300 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors"
-                      >
-                        + {loc}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
-                {/* STEP 1: Star Rating (Unselected 0 by default) */}
+                {/* STEP 1: Star Rating */}
                 <div className="space-y-1.5 rounded-2xl bg-slate-900/60 p-4 border border-slate-800 text-center">
                   <Label className="text-xs font-bold uppercase tracking-wider text-amber-400 block">
                     Overall Rating *
@@ -526,7 +551,7 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                           onClick={() => setFormData((prev) => ({ ...prev, rating: star }))}
                           onMouseEnter={() => setHoverRating(star)}
                           onMouseLeave={() => setHoverRating(null)}
-                          className="p-1 transition-transform hover:scale-125 focus:outline-none"
+                          className="p-1 transition-transform hover:scale-125 focus:outline-none cursor-pointer"
                         >
                           <Star
                             className={`h-8 w-8 ${
@@ -564,7 +589,7 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                   />
                 </div>
 
-                {/* STEP 2: REVEALED PROGRESSIVE SECTIONS (Only visible after selecting 1-5 stars) */}
+                {/* STEP 2: Progressive Details */}
                 {formData.rating > 0 && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -644,7 +669,7 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                       </div>
                     </div>
 
-                    {/* What did you like about our service? (Multi-select) */}
+                    {/* What did you like about our service? */}
                     <div className="space-y-2">
                       <Label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                         <ThumbsUp className="h-3.5 w-3.5 text-emerald-400" /> What did you like about our service?
@@ -750,7 +775,7 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                       </div>
                     </div>
 
-                    {/* Add Project Photos (Optional) */}
+                    {/* Add Project Photos */}
                     <div className="space-y-2 pt-1">
                       <Label className="text-xs font-bold text-slate-300 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
@@ -788,32 +813,34 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
                         )}
                       </div>
                     </div>
-
-                    {apiError && (
-                      <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 mt-2">
-                        <AlertCircle className="h-4 w-4 shrink-0" />
-                        <span>{apiError}</span>
-                      </div>
-                    )}
-
-                    {/* Prominent Submit Button */}
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full rounded-xl bg-gradient-brand py-3 h-12 text-sm font-bold text-primary-foreground shadow-glow flex items-center justify-center gap-2 mt-4 cursor-pointer disabled:opacity-50"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" /> Submitting for Moderation...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="h-4 w-4" /> Submit Review for Verification
-                        </>
-                      )}
-                    </Button>
                   </motion.div>
                 )}
+
+                {apiError && (
+                  <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 mt-2">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{apiError}</span>
+                  </div>
+                )}
+
+                {/* Submit Review Button - Always visible and at the bottom of the form */}
+                <div className="pt-2 pb-2">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full rounded-xl bg-gradient-brand py-3 h-12 text-sm font-bold text-primary-foreground shadow-glow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> Submitting for Moderation...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" /> Submit Review for Verification
+                      </>
+                    )}
+                  </Button>
+                </div>
               </form>
             )}
           </div>
@@ -823,50 +850,90 @@ export const Testimonials = ({ isHomePage = false }: TestimonialsProps) => {
   );
 };
 
-/* Individual Horizontal Testimonial Card Item */
-const TestimonialCardItem = ({
+/* Individual Stacked Deck Testimonial Card Component */
+const TestimonialCardDeckItem = ({
   item,
-  isCenter,
+  isFront,
 }: {
   item: TestimonialItem;
-  isCenter: boolean;
-}) => (
-  <div
-    className={`group relative w-full overflow-hidden text-center p-6 sm:p-8 md:p-9 rounded-3xl transition-all duration-500 testimonial-card-gradient-border bg-card/95 backdrop-blur-xl ${
-      isCenter
-        ? "shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5),0_15px_35px_-10px_rgba(34,197,94,0.25)]"
-        : ""
-    }`}
-  >
-    {/* Clean Customer Rating Stars */}
-    <div className="mb-4 flex items-center justify-center gap-1.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`h-4 sm:h-5 w-4 sm:w-5 transition-transform duration-300 group-hover:scale-110 ${
-            i < item.rating
-              ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.7)]"
-              : "fill-muted/40 text-muted-foreground/30"
-          }`}
-        />
-      ))}
-    </div>
+  isFront: boolean;
+}) => {
+  const initial = item.name ? item.name.charAt(0).toUpperCase() : "S";
 
-    {/* Customer Review Quote Content */}
-    <blockquote className="text-sm sm:text-base md:text-lg font-medium text-foreground leading-relaxed italic max-w-2xl mx-auto">
-      &ldquo;{item.quote}&rdquo;
-    </blockquote>
+  return (
+    <div
+      className={`group relative w-full overflow-hidden text-left p-6 sm:p-8 md:p-9 rounded-3xl transition-all duration-500 border bg-card/95 backdrop-blur-2xl ${
+        isFront
+          ? "border-emerald-500/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5),0_0_30px_-5px_rgba(22,163,74,0.2)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_35px_-5px_rgba(34,197,94,0.3)]"
+          : "border-border/60 shadow-md bg-card/85"
+      }`}
+    >
+      {/* Decorative Golden Ambient Accent */}
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-sun opacity-10 blur-2xl pointer-events-none"
+      />
 
-    {/* Clean Customer Details Footer - Name & Address/Location ONLY */}
-    <div className="mt-6 pt-4 border-t border-border/50 flex flex-col items-center justify-center space-y-1">
-      <h3 className="font-display font-bold text-base sm:text-lg text-foreground tracking-tight">
-        {item.name}
-      </h3>
-      <p className="text-xs sm:text-sm font-semibold text-emerald-400 flex items-center justify-center gap-1">
-        <span>📍 {item.location}</span>
-      </p>
+      {/* Top Header Row: Rating Stars + Verified Customer Tag + Quote Icon */}
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          {/* 5-Star Rating */}
+          <div className="flex items-center gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                className={`h-4 sm:h-4.5 w-4 sm:w-4.5 transition-transform duration-300 ${
+                  i < item.rating
+                    ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]"
+                    : "fill-muted/40 text-muted-foreground/30"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Verified Badge */}
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-2.5 py-0.5">
+            <CheckCircle2 className="h-3 w-3" /> Verified Client
+          </span>
+        </div>
+
+        {/* Decorative Quote Icon */}
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+          <Quote className="h-3.5 w-3.5 fill-primary/25" />
+        </div>
+      </div>
+
+      {/* Customer Review Quote Content */}
+      <blockquote className="text-sm sm:text-base md:text-lg font-medium text-foreground leading-relaxed italic">
+        &ldquo;{item.quote}&rdquo;
+      </blockquote>
+
+      {/* Bottom Author Row: Avatar + Name + District Location */}
+      <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          {/* Avatar Initial Disc */}
+          <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-gradient-brand text-slate-950 font-display font-bold text-sm sm:text-base shadow-md shrink-0">
+            {initial}
+          </div>
+
+          <div className="flex flex-col">
+            <h3 className="font-display font-bold text-base sm:text-lg text-foreground tracking-tight leading-snug">
+              {item.name}
+            </h3>
+            <p className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 flex items-center gap-1">
+              <span>📍 {item.location}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* UP Solar Guarantee Badge */}
+        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-muted/60 rounded-full px-3 py-1 border border-border/60">
+          <Sparkles className="h-3 w-3 text-amber-400" /> 25Y Warranty
+        </span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Testimonials;
+

@@ -10,7 +10,7 @@ import indianRuralAfter from "@/assets/indian-rural-house-after.png";
 const BEFORE_IMAGE = indianRuralBefore;
 const AFTER_IMAGE = indianRuralAfter;
 
-export const BeforeAfter = () => {
+export const BeforeAfter = ({ className = "" }: { className?: string } = {}) => {
   const [showAfter, setShowAfter] = useState(false);
   const [resetKey, setResetKey] = useState(0);
 
@@ -29,7 +29,7 @@ export const BeforeAfter = () => {
   };
 
   return (
-    <MotionSection animation="zoomIn" className="section bg-gradient-soft overflow-hidden py-20 md:py-28">
+    <MotionSection animation="zoomIn" className={`section bg-gradient-soft overflow-hidden py-10 md:py-14 ${className}`}>
       <div className="container-wide">
         <SectionHeading
           eyebrow="Before vs After Comparison"
@@ -38,7 +38,7 @@ export const BeforeAfter = () => {
         />
 
         {/* Real Photo Comparison Frame with Infinite Smooth Auto Transition */}
-        <div className="relative mt-12 aspect-[16/9] sm:aspect-[21/9] min-h-[380px] md:min-h-[460px] w-full select-none overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl group">
+        <div className="relative mt-8 md:mt-10 aspect-[16/9] sm:aspect-[21/9] min-h-[380px] md:min-h-[460px] w-full select-none overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl group">
           {/* 1. BEFORE IMAGE LAYER */}
           <motion.img
             src={BEFORE_IMAGE}

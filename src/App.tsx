@@ -3,9 +3,25 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { SmoothScroll } from "./components/SmoothScroll";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/admin/ProtectedRoute";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminLogin } from "./pages/admin/AdminLogin";
+import { AdminDashboardOverview } from "./pages/admin/AdminDashboardOverview";
+import { AdminQuotations } from "./pages/admin/AdminQuotations";
+import { AdminCustomers } from "./pages/admin/AdminCustomers";
+import { AdminProjects } from "./pages/admin/AdminProjects";
+import { AdminReviews } from "./pages/admin/AdminReviews";
+import { AdminBlogs } from "./pages/admin/AdminBlogs";
+import { AdminGovernmentData } from "./pages/admin/AdminGovernmentData";
+import { AdminContactMessages } from "./pages/admin/AdminContactMessages";
+import { AdminChatbot } from "./pages/admin/AdminChatbot";
+import { AdminSettings } from "./pages/admin/AdminSettings";
+
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -39,15 +55,13 @@ const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, scale: 0.96, filter: "blur(14px)" }}
-        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, scale: 1.02, filter: "blur(14px)" }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Routes location={location}>
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+    >
+      <Routes location={location}>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
@@ -66,8 +80,33 @@ const AnimatedRoutes = () => {
           <Route path="/subsidy" element={<Subsidy />} />
           <Route path="/pm-surya-ghar-yojana" element={<Subsidy />} />
           <Route path="/refer-and-earn" element={<ReferAndEarn />} />
-          <Route path="/admin/referrals" element={<AdminReferrals />} />
-          <Route path="/admin/database" element={<AdminDatabase />} />
+
+          {/* Dedicated Admin Login */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          {/* Secure Admin Dashboard Parent Layout */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminDashboardOverview />} />
+            <Route path="quotations" element={<AdminQuotations />} />
+            <Route path="customers" element={<AdminCustomers />} />
+            <Route path="referrals" element={<AdminReferrals />} />
+            <Route path="projects" element={<AdminProjects />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="blogs" element={<AdminBlogs />} />
+            <Route path="government-data" element={<AdminGovernmentData />} />
+            <Route path="contact-messages" element={<AdminContactMessages />} />
+            <Route path="chatbot" element={<AdminChatbot />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="database" element={<AdminDatabase />} />
+          </Route>
+
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
@@ -79,21 +118,23 @@ const AnimatedRoutes = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
-    </AnimatePresence>
   );
 };
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner position="bottom-center" />
-        <BrowserRouter>
-          <ScrollToTop />
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner position="bottom-center" />
+          <BrowserRouter>
+            <SmoothScroll />
+            <ScrollToTop />
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

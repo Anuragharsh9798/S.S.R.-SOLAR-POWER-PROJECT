@@ -21,7 +21,7 @@ export class BlogsService {
         excerpt: 'Essential checklist before going solar: roof direction, shadow analysis, structural load capacity, wiring route, and sanctioned grid load.',
         date: '12 July 2026',
         readTime: '6 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1000&q=80',
         content: JSON.stringify([
           '1. Roof Orientation and Tilt Angle: In India, rooftops with true south-facing orientation receive maximum solar irradiance throughout the year. East and west facing installations can also generate substantial electricity, but tilt angle alignment (typically 15° to 25° depending on latitude) ensures optimal year-round sunlight absorption.',
           '2. Shadow-Free Clearance Audit: Conduct a thorough shadow audit between 9:00 AM and 4:00 PM. Parapet walls, adjacent tall buildings, water storage tanks, staircase rooms, and nearby trees can cast shadows across solar modules, reducing power generation.',
@@ -40,7 +40,7 @@ export class BlogsService {
         excerpt: 'Complete guide to PM Surya Ghar Muft Bijli Yojana: slab-wise financial assistance, 51.58 Lakh households benefiting, ₹28,024 Cr transferred, national portal application workflow, and DBT credit.',
         date: '28 June 2026',
         readTime: '8 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=1000&q=80',
         content: JSON.stringify([
           'PM Surya Ghar Muft Bijli Yojana Flagship Initiative: Under the government\'s flagship PM Surya Ghar: Muft Bijli Yojana, over 51.58 Lakh households across India are benefiting from clean rooftop solar power. The central government has released over ₹28,024 Crore in direct subsidy transfers, reaching a total commissioned capacity of 14.8 GW across 50+ Lakh installations.',
           'Slab-Wise Financial Assistance Structure: Central financial assistance under PM Surya Ghar is structured directly by system capacity: ₹30,000 for 1 kW plants, ₹60,000 for 2 kW plants, and up to ₹78,000 for 3 kW and higher systems. In states like Uttar Pradesh, additional state top-up subsidies of up to ₹30,000 bring total solar subsidy benefits up to ₹1,08,000 for domestic consumers.',
@@ -56,7 +56,7 @@ export class BlogsService {
         excerpt: 'Practical maintenance tips: cleaning techniques, dust management, post-monsoon inspections, and inverter yield tracking.',
         date: '9 June 2026',
         readTime: '5 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1559302504-64aae6ca6b6d?w=1000&q=80',
         content: JSON.stringify([
           '1. Regular Water Cleaning Schedule: Dust, dry leaves, bird droppings, and industrial soot reduce light transmission through solar glass. Cleaning panels every 15 to 20 days with plain water restores optimal generation.',
           '2. Cool Hour Washing: Wash solar modules during early morning or late evening hours. Spraying cold water on solar panels under intense midday summer sunlight causes extreme thermal stress that can crack glass or damage internal cell interconnects.',
@@ -72,7 +72,7 @@ export class BlogsService {
         excerpt: 'Comparing cell efficiency, temperature coefficient, degradation rates, and low-light performance of modern PV module technologies.',
         date: '22 May 2026',
         readTime: '7 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1545209463-e2825498edbf?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32f?w=1000&q=80',
         content: JSON.stringify([
           'Monocrystalline PERC Overview: Mono PERC (Passivated Emitter and Rear Cell) has been the dominant solar cell technology for years, delivering proven module efficiencies of 20% to 21.3% with high structural reliability.',
           'TOPCon (Tunnel Oxide Passivated Contact) Innovation: N-type TOPCon is an advanced cell architecture incorporating an ultra-thin silicon oxide tunnel layer that reduces carrier recombination, elevating module efficiency to 22% and higher.',
@@ -88,7 +88,7 @@ export class BlogsService {
         excerpt: 'Grid-tied solar vs battery backup systems: power outages, net metering, battery costs, and household energy security.',
         date: '14 May 2026',
         readTime: '8 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1592833159155-c62df1b65634?w=1000&q=80',
         content: JSON.stringify([
           'On-Grid (Grid-Tied) Solar Systems: On-grid systems connect directly to your local DISCOM power grid. Solar power generated during the day powers home appliances, and surplus energy is exported to the grid via net metering.',
           'Grid Safety & Anti-Islanding: During grid power outages, on-grid inverters automatically shut down within milliseconds (anti-islanding) to protect DISCOM maintenance personnel working on utility lines.',
@@ -120,7 +120,7 @@ export class BlogsService {
         excerpt: 'Product manufacturing warranty vs Linear power output warranty, degradation curves, and essential documentation.',
         date: '15 April 2026',
         readTime: '6 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1584267385494-9fdd9a71ad75?w=1000&q=80',
         content: JSON.stringify([
           'Product Warranty vs Performance Warranty: Solar module warranties consist of two separate guarantees: the Product/Workmanship Warranty and the Linear Power Output Warranty.',
           'Product Warranty (10–12 Years): Covers manufacturing defects, structural glass damage, frame joint failures, junction box defects, or bypass diode failures.',
@@ -136,7 +136,7 @@ export class BlogsService {
         excerpt: 'How bi-directional net meters track imported vs exported solar units, monthly bill adjustments, and DISCOM grid integration.',
         date: '3 April 2026',
         readTime: '7 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1545209463-e2825498edbf?w=1000&q=80',
         content: JSON.stringify([
           'What is a Bi-Directional Net Meter?: A net meter replaces your standard DISCOM electricity meter. It records both electricity imported from the grid and excess solar electricity exported to the grid.',
           'Daytime Generation & Export Flow: During sunny daytime hours, if your rooftop solar system generates more power than your home uses, surplus electricity automatically flows into the DISCOM grid.',
@@ -152,7 +152,7 @@ export class BlogsService {
         excerpt: 'String inverters vs hybrid inverters, MPPT channels, efficiency ratings, weather protection, and mobile app tracking.',
         date: '18 March 2026',
         readTime: '7 min read',
-        featuredImage: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&q=80',
+        featuredImage: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?w=1000&q=80',
         content: JSON.stringify([
           'The Central Role of Solar Inverters: Solar panels generate DC electricity. The solar inverter converts DC energy into regulated 230V/415V AC electricity suitable for home appliances and grid export.',
           'Matching Inverter kW to Panel Array Wp: Select an inverter whose kW rating and DC voltage window match your solar panel array\'s cumulative peak capacity.',
@@ -285,6 +285,28 @@ export class BlogsService {
     const mapBySlug = new Map<string, any>();
     for (const b of this.inMemoryBlogs.values()) {
       if (b.isPublished && b.slug) {
+        mapBySlug.set(b.slug, b);
+      }
+    }
+    return Array.from(mapBySlug.values()).map((b) => this.formatBlogResponse(b));
+  }
+
+  async findAllAdmin() {
+    try {
+      const dbBlogs = await this.prisma.blog.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: { category: true },
+      });
+      if (dbBlogs && dbBlogs.length > 0) {
+        return dbBlogs.map((b) => this.formatBlogResponse(b));
+      }
+    } catch (err) {
+      this.logger.warn(`Blogs DB lookup notice: ${err.message}`);
+    }
+
+    const mapBySlug = new Map<string, any>();
+    for (const b of this.inMemoryBlogs.values()) {
+      if (b.slug) {
         mapBySlug.set(b.slug, b);
       }
     }

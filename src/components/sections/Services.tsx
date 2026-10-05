@@ -101,15 +101,15 @@ export const ServiceCard = ({ service, index = 0 }: { service: (typeof services)
   );
 };
 
-export const ServicesSection = () => (
-  <section className="section">
+export const ServicesSection = ({ className = "" }: { className?: string }) => (
+  <section className={`section py-10 md:py-14 ${className}`}>
     <div className="container-wide">
       <SectionHeading
         eyebrow="Our Services"
         title={<>Solar solutions for every <span className="text-gradient">roof and business</span></>}
         description="From a single-home rooftop to commercial business plants, one accountable partner throughout."
       />
-      <div className="mt-14 grid gap-7 md:grid-cols-2 lg:grid-cols-2 mx-auto max-w-4xl">
+      <div className="mt-8 md:mt-10 grid gap-6 md:grid-cols-2 mx-auto max-w-4xl">
         {services.map((s, i) => (
           <ServiceCard key={s.slug} service={s} index={i} />
         ))}

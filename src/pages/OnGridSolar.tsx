@@ -37,7 +37,8 @@ export const OnGridSolar = () => (
     <PageHero
       eyebrow="Solar Solutions"
       title="On-Grid Solar Power Systems"
-      description="Maximise electricity bill savings with grid-tied rooftop solar technology. Feed excess generation back into the utility grid via bidirectional net metering and claim government subsidies up to ₹1,08,000."
+      className="pb-10 md:pb-14"
+      description="On-grid solar systems generate clean electricity from rooftop solar panels and synchronize directly with the utility power grid to power your daily energy needs. During peak sunlight hours, any surplus energy produced is automatically exported to the electricity grid via bidirectional net metering, offsetting power drawn at night and substantially lowering monthly electricity bills. Highly suitable for both residential homes seeking long-term utility savings and commercial establishments looking to reduce operational overheads, SSR Solar Power provides end-to-end support—from precise rooftop assessment and system sizing to professional installation and DISCOM grid coordination."
       image={onGridSolarSystem}
     >
       <div className="flex flex-wrap gap-4">
@@ -48,20 +49,20 @@ export const OnGridSolar = () => (
     </PageHero>
 
     {/* 1. What is On-Grid Solar? */}
-    <MotionSection animation="fadeUp" className="section">
-      <div className="container-wide grid items-center gap-12 lg:grid-cols-2">
+    <MotionSection animation="fadeUp" className="section pt-0 pb-10 md:pb-14">
+      <div className="container-wide grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
         <div>
           <span className="eyebrow">System Architecture</span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+          <h2 className="mt-3.5 text-3xl font-bold tracking-tight md:text-4xl">
             What is an <span className="text-gradient">On-Grid Solar System</span>?
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+          <p className="mt-3.5 text-base leading-relaxed text-muted-foreground">
             An On-Grid (or Grid-Tied) Solar System is directly synchronized with your local state electricity discom grid. It converts sunlight into 230V/415V AC power to meet your active building load during daylight hours.
           </p>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
             When your solar array produces more electricity than your premises requires, the surplus energy is automatically exported to the utility grid. Your bidirectional net meter records exported units against imported units, drastically reducing your monthly power bill by up to 90%.
           </p>
-          <div className="mt-6 grid grid-cols-2 gap-4">
+          <div className="mt-5 grid grid-cols-2 gap-4">
             <div className="rounded-2xl border bg-card p-4 shadow-soft">
               <p className="text-2xl font-bold text-primary">Up to 90%</p>
               <p className="text-xs text-muted-foreground">Monthly Bill Reduction</p>
@@ -83,7 +84,7 @@ export const OnGridSolar = () => (
     </MotionSection>
 
     {/* 2. How it Works */}
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Operating Principle"
@@ -91,7 +92,7 @@ export const OnGridSolar = () => (
           description="A seamless, fully automated 4-step energy cycle synchronised with the utility grid."
         />
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 md:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               step: "01",
@@ -138,7 +139,7 @@ export const OnGridSolar = () => (
     </MotionSection>
 
     {/* 3. Main Components */}
-    <MotionSection animation="fadeUp" className="section">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Engineering Integrity"
@@ -146,7 +147,7 @@ export const OnGridSolar = () => (
           description="SSR Solar Power uses Tier-1 IEC & BIS certified components engineered for 25+ years of reliable outdoor operation."
         />
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 md:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[
             {
               title: "Tier-1 Solar PV Modules",
@@ -192,7 +193,7 @@ export const OnGridSolar = () => (
     </MotionSection>
 
     {/* 4. Benefits vs Limitations */}
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Evaluation Matrix"
@@ -200,9 +201,9 @@ export const OnGridSolar = () => (
           description="Understand the financial and operational trade-offs of On-Grid Solar Systems."
         />
 
-        <div className="mt-14 grid gap-8 md:grid-cols-2">
+        <div className="mt-8 md:mt-10 grid gap-6 md:grid-cols-2">
           {/* Benefits */}
-          <div className="rounded-3xl border border-emerald-500/20 bg-card p-7 shadow-soft space-y-5">
+          <div className="rounded-3xl border border-emerald-500/20 bg-card p-6 md:p-7 shadow-soft space-y-4">
             <div className="flex items-center gap-3">
               <CheckCircle2 className="h-6 w-6 text-emerald-600" />
               <h3 className="text-xl font-bold text-foreground">Key Advantages</h3>
@@ -228,7 +229,7 @@ export const OnGridSolar = () => (
           </div>
 
           {/* Limitations */}
-          <div className="rounded-3xl border border-amber-500/20 bg-card p-7 shadow-soft space-y-5">
+          <div className="rounded-3xl border border-amber-500/20 bg-card p-6 md:p-7 shadow-soft space-y-4">
             <div className="flex items-center gap-3">
               <XCircle className="h-6 w-6 text-amber-600" />
               <h3 className="text-xl font-bold text-foreground">System Limitations</h3>
@@ -253,7 +254,7 @@ export const OnGridSolar = () => (
     </MotionSection>
 
     {/* 5. Who Should Choose & Use Cases */}
-    <MotionSection animation="fadeUp" className="section">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Target Applications"
@@ -261,7 +262,7 @@ export const OnGridSolar = () => (
           description="Ideal candidates and typical installation profiles for maximum financial savings."
         />
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-8 md:mt-10 grid gap-5 md:grid-cols-3">
           <div className="rounded-3xl border bg-card p-6 shadow-soft space-y-3">
             <PiggyBank className="h-8 w-8 text-primary" />
             <h3 className="text-lg font-bold">Urban Homeowners</h3>
@@ -288,14 +289,14 @@ export const OnGridSolar = () => (
     </MotionSection>
 
     {/* 6. FAQs */}
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
       <div className="container-wide max-w-4xl">
         <SectionHeading
           eyebrow="Common Questions"
           title={<>On-Grid Solar <span className="text-gradient">FAQs</span></>}
         />
 
-        <div className="mt-10">
+        <div className="mt-8 md:mt-9">
           <Accordion type="single" collapsible className="w-full space-y-3">
             <AccordionItem value="item-1" className="rounded-2xl border bg-card px-5">
               <AccordionTrigger className="text-base font-semibold">How does net metering work in Uttar Pradesh?</AccordionTrigger>

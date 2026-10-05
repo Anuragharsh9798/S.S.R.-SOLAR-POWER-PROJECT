@@ -7,7 +7,7 @@ export const VideoSection = () => {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <MotionSection animation="zoomIn" id="promo-video" className="section">
+    <MotionSection animation="zoomIn" id="promo-video" className="section py-10 md:py-14">
       <div className="container-wide">
         <div className="relative overflow-hidden rounded-[2rem] border shadow-card">
           {playing ? (

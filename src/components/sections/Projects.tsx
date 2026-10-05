@@ -22,7 +22,7 @@ import { api } from "@/lib/api";
 
 const filters = ["All", "Residential", "Commercial"] as const;
 
-export const ProjectsGrid = ({ heading = true }: { heading?: boolean }) => {
+export const ProjectsGrid = ({ heading = true, className = "" }: { heading?: boolean; className?: string }) => {
   const [active, setActive] = useState<(typeof filters)[number]>("All");
   const [projectList, setProjectList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,8 +79,8 @@ export const ProjectsGrid = ({ heading = true }: { heading?: boolean }) => {
       : projectList.filter((p) => (p.type || p.category) === active);
 
   return (
-    <MotionSection animation="fadeUp" className="section">
-      <div className="container-wide space-y-10">
+    <MotionSection animation="fadeUp" className={`section py-10 md:py-14 ${className}`}>
+      <div className="container-wide space-y-7 md:space-y-8">
         {heading && (
           <SectionHeading
             eyebrow="Completed Projects"

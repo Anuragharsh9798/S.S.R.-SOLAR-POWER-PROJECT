@@ -6,7 +6,7 @@ import { navLinks, company } from "@/data/site";
 import { ThemeToggle } from "./ThemeToggle";
 import { useTheme } from "./ThemeProvider";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchModal } from "./SearchModal";
 import { BrandWordmark } from "./BrandWordmark";
 import { openFreeQuoteModal } from "./FreeQuoteModal";
 
@@ -18,10 +18,10 @@ export const DayNightToggle = ({ onDark, className = "" }: { onDark?: boolean; c
       type="button"
       onClick={toggle}
       aria-label={isNight ? "Switch to Day View" : "Switch to Night View"}
-      whileHover={{ scale: 1.06 }}
-      whileTap={{ scale: 0.93 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.94 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative inline-flex h-10 items-center gap-2 rounded-full border px-3.5 text-xs font-semibold backdrop-blur-xl transition-all shadow-soft hover:shadow-[0_0_20px_rgba(22,163,74,0.45)] ${
+      className={`relative inline-flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-full border px-2.5 sm:px-3.5 text-xs font-semibold backdrop-blur-xl transition-all shadow-soft hover:shadow-[0_0_20px_rgba(22,163,74,0.45)] shrink-0 ${
         onDark
           ? "border-white/30 bg-white/10 text-white hover:border-emerald-400/60"
           : "border-border/70 bg-card/80 text-foreground hover:border-primary/60 hover:text-primary"
@@ -29,7 +29,7 @@ export const DayNightToggle = ({ onDark, className = "" }: { onDark?: boolean; c
       style={{ transitionDuration: "500ms" }}
     >
       {/* Icon Disc Wrapper */}
-      <span className="relative flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-slate-950 shadow-sm">
+      <span className="relative flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-slate-950 shadow-sm shrink-0">
         {/* Sun Icon (Rotates 180deg & morphs scale) */}
         <motion.span
           animate={{
@@ -40,7 +40,7 @@ export const DayNightToggle = ({ onDark, className = "" }: { onDark?: boolean; c
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0 flex items-center justify-center"
         >
-          <Sun className="h-4 w-4 text-slate-950" />
+          <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-950" />
         </motion.span>
 
         {/* Moon Icon (Fades in with smooth rotate morph) */}
@@ -53,12 +53,12 @@ export const DayNightToggle = ({ onDark, className = "" }: { onDark?: boolean; c
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0 flex items-center justify-center"
         >
-          <Moon className="h-3.5 w-3.5 text-slate-950 fill-slate-950" />
+          <Moon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-950 fill-slate-950" />
         </motion.span>
       </span>
 
       {/* Track Label with Stars / Cloud Morph */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center shrink-0">
         <AnimatePresence mode="wait">
           {isNight ? (
             <motion.span
@@ -67,10 +67,10 @@ export const DayNightToggle = ({ onDark, className = "" }: { onDark?: boolean; c
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.8, x: -4 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="flex items-center gap-1.5"
+              className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
             >
-              <Sparkles className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
-              <span className="hidden sm:inline-block">Night View</span>
+              <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-400 animate-pulse shrink-0" />
+              <span className="hidden sm:inline-block text-[11px] sm:text-xs">Night View</span>
             </motion.span>
           ) : (
             <motion.span
@@ -79,10 +79,10 @@ export const DayNightToggle = ({ onDark, className = "" }: { onDark?: boolean; c
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.8, x: 4 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="flex items-center gap-1.5"
+              className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
             >
-              <Cloud className="h-3.5 w-3.5 text-amber-400" />
-              <span className="hidden sm:inline-block">Day View</span>
+              <Cloud className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline-block text-[11px] sm:text-xs">Day View</span>
             </motion.span>
           )}
         </AnimatePresence>
@@ -103,17 +103,26 @@ export const Navbar = () => {
 
   useEffect(() => {
     let last = window.scrollY;
+    let ticking = false;
+
     const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 20);
-      
-      // Hide while scrolling down past 80px; show while scrolling up
-      if (y > 80 && y > last + 5) {
-        setHidden(true);
-      } else if (y < last - 5 || y <= 80) {
-        setHidden(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const y = window.scrollY;
+          const isScrolled = y > 20;
+          setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+
+          // Hide while scrolling down past 80px; show while scrolling up
+          if (y > 80 && y > last + 5) {
+            setHidden((prev) => (!prev ? true : prev));
+          } else if (y < last - 5 || y <= 80) {
+            setHidden((prev) => (prev ? false : prev));
+          }
+          last = y;
+          ticking = false;
+        });
+        ticking = true;
       }
-      last = y;
     };
 
     onScroll();
@@ -140,28 +149,30 @@ export const Navbar = () => {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <nav className="container-wide flex h-[74px] items-center justify-between gap-4" aria-label="Main navigation">
+      <nav className="mx-auto flex h-[74px] w-full max-w-[1440px] items-center justify-between px-2.5 sm:px-4 lg:px-5 xl:px-8 gap-1.5 sm:gap-2 lg:gap-3 min-w-0" aria-label="Main navigation">
         {/* Header Logo & Brand Wordmark */}
-        <Link to="/" className="group flex items-center gap-2.5 shrink-0 mr-6 sm:mr-8 lg:mr-10">
+        <Link to="/" className="group flex items-center gap-1.5 sm:gap-2.5 shrink-0 mr-0.5 sm:mr-1.5 lg:mr-2 xl:mr-4">
           <motion.div
             animate={{ y: [0, -3.5, 0] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="flex items-center gap-2.5"
+            className="flex items-center gap-1.5 sm:gap-2.5"
           >
             <motion.img
               src="/logo-icon.png"
               alt="SSR Solar Power Logo Icon"
               whileHover={{ scale: 1.08 }}
               transition={{ duration: 0.3 }}
-              className="h-10 w-10 sm:h-11 sm:w-11 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
+              className="h-8 w-8 sm:h-9 sm:w-9 lg:h-9 lg:w-9 xl:h-11 xl:w-11 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
             />
-            <BrandWordmark onDark={onDark} className="text-base sm:text-lg" />
+            <BrandWordmark onDark={onDark} className="text-xs sm:text-sm lg:text-xs xl:text-base 2xl:text-lg" />
           </motion.div>
         </Link>
 
         {/* Desktop Nav Links with Active Underline Animation */}
-        <ul className="hidden items-center gap-0.5 xl:flex">
+        <ul className="hidden items-center lg:flex gap-0.5 xl:gap-1 shrink min-w-0">
           {navLinks.map((link) => {
+            const isCalcLink = link.href === "/calculator";
+
             if (link.hasDropdown) {
               const isChildActive = link.children?.some(
                 (c) => location.pathname === c.href
@@ -178,7 +189,7 @@ export const Navbar = () => {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown((prev) => (prev === link.label ? null : link.label))}
-                    className={`group relative inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                    className={`group relative inline-flex items-center gap-0.5 lg:gap-1 whitespace-nowrap rounded-full px-1.5 lg:px-2 xl:px-2.5 2xl:px-3 py-1.5 2xl:py-2 text-xs lg:text-[12px] xl:text-[13.5px] 2xl:text-sm font-medium transition-colors duration-300 ${
                       isChildActive
                         ? onDark
                           ? "text-[hsl(48_96%_60%)] font-semibold"
@@ -190,14 +201,14 @@ export const Navbar = () => {
                   >
                     <span>{link.label}</span>
                     <ChevronDown
-                      className={`h-3.5 w-3.5 transition-transform duration-300 ${
+                      className={`h-3 w-3 xl:h-3.5 xl:w-3.5 transition-transform duration-300 ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     />
                     {isChildActive && (
                       <motion.span
                         layoutId="activeNavUnderline"
-                        className={`absolute inset-x-2.5 -bottom-0.5 h-[2.5px] rounded-full ${
+                        className={`absolute inset-x-2 -bottom-0.5 h-[2.5px] rounded-full ${
                           onDark
                             ? "bg-[hsl(48_96%_60%)] shadow-[0_0_10px_rgba(250,204,21,0.6)]"
                             : "bg-gradient-brand shadow-glow"
@@ -241,11 +252,11 @@ export const Navbar = () => {
 
             const isActive = location.pathname === link.href;
             return (
-              <li key={link.href} className="relative">
+              <li key={link.href} className={`relative ${isCalcLink ? "hidden xl:block" : ""}`}>
                 <NavLink
                   to={link.href}
                   className={() =>
-                    `group relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                    `group relative whitespace-nowrap rounded-full px-1.5 lg:px-2 xl:px-2.5 2xl:px-3 py-1.5 2xl:py-2 text-xs lg:text-[12px] xl:text-[13.5px] 2xl:text-sm font-medium transition-colors duration-300 ${
                       isActive
                         ? onDark
                           ? "text-[hsl(48_96%_60%)] font-semibold"
@@ -260,7 +271,7 @@ export const Navbar = () => {
                   {isActive ? (
                     <motion.span
                       layoutId="activeNavUnderline"
-                      className={`absolute inset-x-2.5 -bottom-0.5 h-[2.5px] rounded-full ${
+                      className={`absolute inset-x-2 -bottom-0.5 h-[2.5px] rounded-full ${
                         onDark
                           ? "bg-[hsl(48_96%_60%)] shadow-[0_0_10px_rgba(250,204,21,0.6)]"
                           : "bg-gradient-brand shadow-glow"
@@ -268,7 +279,7 @@ export const Navbar = () => {
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   ) : (
-                    <span className="absolute inset-x-2.5 -bottom-0.5 h-[2px] origin-left scale-x-0 rounded-full bg-primary/60 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+                    <span className="absolute inset-x-2 -bottom-0.5 h-[2px] origin-left scale-x-0 rounded-full bg-primary/60 transition-transform duration-300 ease-out group-hover:scale-x-100" />
                   )}
                 </NavLink>
               </li>
@@ -276,57 +287,53 @@ export const Navbar = () => {
           })}
         </ul>
 
-        {/* Action Controls: More ▼ -> Get Free Quote -> Search */}
-        <div className="flex items-center gap-2">
+        {/* Action Controls: Get Free Quote -> Search -> Day/Night View -> Mobile Menu */}
+        <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 shrink-0">
           <Button
             type="button"
             onClick={openFreeQuoteModal}
-            className="btn-premium btn-gold-shine hidden rounded-full px-5 hover:scale-[1.03] md:inline-flex"
+            className="btn-premium btn-gold-shine inline-flex rounded-full px-2.5 sm:px-3.5 lg:px-3.5 xl:px-5 py-1.5 sm:py-2 text-xs lg:text-[12.5px] xl:text-sm font-semibold whitespace-nowrap hover:scale-[1.03] shrink-0"
           >
             Get Free Quote
           </Button>
 
           <button
             type="button"
-            onClick={() => setSearchOpen((s) => !s)}
+            onClick={() => {
+              setSearchOpen((s) => !s);
+              setOpen(false);
+            }}
             aria-label="Search the site"
-            className={`hidden h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary sm:inline-flex ${
+            className={`inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-9 lg:w-9 xl:h-10 xl:w-10 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary shrink-0 ${
               onDark ? "border-white/30 bg-white/10 text-white" : "border-border bg-card/70 text-foreground"
             }`}
           >
-            <Search className="h-[18px] w-[18px]" />
+            <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <DayNightToggle onDark={onDark} />
           <button
             type="button"
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => {
+              setOpen((o) => !o);
+              setSearchOpen(false);
+            }}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 xl:hidden ${
+            className={`inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-9 lg:w-9 xl:h-10 xl:w-10 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 lg:hidden shrink-0 ${
               onDark ? "border-white/30 bg-white/10 text-white" : "border-border bg-card/70"
             }`}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <Menu className="h-4 w-4 sm:h-5 sm:w-5" />}
           </button>
         </div>
       </nav>
 
-      {/* Search Bar Dropdown */}
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-background/90 backdrop-blur-xl border-t border-border/60 shadow-md"
-          >
-            <div className="container-wide py-4">
-              <Input placeholder="Search services, products, projects..." className="h-12 rounded-full" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Activated Functional Search Bar Modal / Dropdown */}
+      <SearchModal
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onDark={onDark}
+      />
 
       {/* Mobile Menu Open/Close Animation */}
       <AnimatePresence>
@@ -336,7 +343,7 @@ export const Navbar = () => {
             animate={{ opacity: 1, height: "auto", filter: "blur(0px)" }}
             exit={{ opacity: 0, height: 0, filter: "blur(8px)" }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-background/95 backdrop-blur-xl border-t border-border/60 overflow-hidden shadow-xl xl:hidden"
+            className="bg-background/95 backdrop-blur-xl border-t border-border/60 overflow-hidden shadow-xl lg:hidden max-h-[calc(100vh-74px)] overflow-y-auto"
           >
             <motion.ul
               initial="closed"
@@ -346,7 +353,7 @@ export const Navbar = () => {
                 open: { transition: { staggerChildren: 0.04, delayChildren: 0.03 } },
                 closed: { transition: { staggerChildren: 0.02, staggerDirection: -1 } },
               }}
-              className="container-wide grid gap-1 py-5"
+              className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 grid gap-1 py-5"
             >
               {navLinks.map((link) => {
                 if (link.hasDropdown) {

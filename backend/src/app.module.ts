@@ -16,9 +16,12 @@ import { ReferralsModule } from './referrals/referrals.module';
 import { GovernmentStatisticsModule } from './government-statistics/government-statistics.module';
 import { ChatModule } from './chat/chat.module';
 import { AuditLogModule } from './audit-log/audit-log.module';
+import { CustomerModule } from './customer/customer.module';
 import { AdminController } from './admin/admin.controller';
 import { AdminDatabaseController } from './admin/admin-database.controller';
 import { AdminDatabaseService } from './admin/admin-database.service';
+import { AdminSettingsController } from './admin/admin-settings.controller';
+import { AdminSettingsService } from './admin/admin-settings.service';
 import { envValidationSchema } from './config/env.validation';
 import { GlobalHttpExceptionFilter } from './common/filters/http-exception.filter';
 import { SanitizeResponseInterceptor } from './common/interceptors/sanitize-response.interceptor';
@@ -41,6 +44,7 @@ import { SecurityTestController } from './security-test/security-test.controller
     AuthModule,
     CalculatorModule,
     QuotationModule,
+    CustomerModule,
     ProjectsModule,
     ReviewsModule,
     BlogsModule,
@@ -49,10 +53,17 @@ import { SecurityTestController } from './security-test/security-test.controller
     GovernmentStatisticsModule,
     ChatModule,
   ],
-  controllers: [AppController, SecurityTestController, AdminController, AdminDatabaseController],
+  controllers: [
+    AppController,
+    SecurityTestController,
+    AdminController,
+    AdminDatabaseController,
+    AdminSettingsController,
+  ],
   providers: [
     AppService,
     AdminDatabaseService,
+    AdminSettingsService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

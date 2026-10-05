@@ -17,7 +17,10 @@ export class ReviewsService {
       location: dto.location,
       rating: dto.rating || 5,
       systemSizeKw: dto.systemSizeKw,
-      solarType: dto.solarType,
+      solarType:
+        dto.solarType || dto.installType
+          ? [dto.solarType, dto.installType].filter(Boolean).join(' • ')
+          : undefined,
       quote: dto.quote,
       isVerified: false,
       isApproved: false, // Requires admin review before public display
@@ -59,6 +62,17 @@ export class ReviewsService {
     }
   }
 
+  async findAllAdmin() {
+    try {
+      return await this.prisma.review.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (err) {
+      this.logger.warn(`Reviews DB lookup notice: ${err.message}`);
+      return Array.from(this.inMemoryReviews.values());
+    }
+  }
+
   async approveReview(id: string, isApproved: boolean) {
     try {
       const updated = await this.prisma.review.update({
@@ -75,5 +89,14 @@ export class ReviewsService {
       this.inMemoryReviews.set(id, updated);
       return updated;
     }
+  }
+
+  async remove(id: string) {
+    try {
+      await this.prisma.review.delete({ where: { id } });
+    } catch {
+      this.inMemoryReviews.delete(id);
+    }
+    return { message: `Review with ID "${id}" deleted successfully` };
   }
 }

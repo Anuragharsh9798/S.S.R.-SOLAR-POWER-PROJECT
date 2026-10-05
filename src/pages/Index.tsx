@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { Seo } from "@/components/Seo";
+import { SolarIntroAnimation } from "@/components/SolarIntroAnimation";
 import { Hero } from "@/components/sections/Hero";
 import { TrustedBy, StatsSection } from "@/components/sections/Stats";
 import { WhyChoose } from "@/components/sections/WhyChoose";
@@ -17,6 +18,7 @@ import { SchemePromoCard } from "@/components/SchemePromoCard";
 
 const Index = () => (
   <Layout>
+    <SolarIntroAnimation />
     <Seo
       title="SSR Solar Power | Residential & Commercial Solar Solutions"
       description="Reduce your electricity bills by up to 90% with SSR Solar Power — premium rooftop and commercial solar systems, subsidy assistance, EMI options and 25-year warranty."

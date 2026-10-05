@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 interface PageHeroProps {
   eyebrow?: string;
   title: string;
-  description?: string;
+  description?: ReactNode;
   image?: string;
   children?: ReactNode;
   rightContent?: ReactNode;
@@ -56,9 +56,15 @@ export const PageHero = ({
               className="lg:col-span-6 xl:col-span-5"
             >
               {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-              <h1 className="mt-5 text-4xl leading-[1.08] text-balance md:text-5xl lg:text-6xl">{title}</h1>
-              {description && <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">{description}</p>}
-              {children && <div className="mt-8">{children}</div>}
+              <h1 className="mt-3.5 text-4xl leading-[1.08] text-balance md:text-5xl lg:text-6xl">{title}</h1>
+              {description && (
+                typeof description === "string" ? (
+                  <p className="mt-3.5 md:mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">{description}</p>
+                ) : (
+                  <div className="mt-3.5 md:mt-4 space-y-3 text-base leading-relaxed text-muted-foreground md:text-lg">{description}</div>
+                )
+              )}
+              {children && <div className="mt-6 md:mt-7">{children}</div>}
             </motion.div>
 
             <motion.div
@@ -78,9 +84,15 @@ export const PageHero = ({
             className="max-w-3xl"
           >
             {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-            <h1 className="mt-5 text-4xl leading-[1.08] text-balance md:text-5xl lg:text-6xl">{title}</h1>
-            {description && <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">{description}</p>}
-            {children && <div className="mt-8">{children}</div>}
+            <h1 className="mt-3.5 text-4xl leading-[1.08] text-balance md:text-5xl lg:text-6xl">{title}</h1>
+            {description && (
+              typeof description === "string" ? (
+                <p className="mt-3.5 md:mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">{description}</p>
+              ) : (
+                <div className="mt-3.5 md:mt-4 max-w-3xl space-y-3.5 text-base leading-relaxed text-muted-foreground md:text-lg">{description}</div>
+              )
+            )}
+            {children && <div className="mt-6 md:mt-7">{children}</div>}
           </motion.div>
         )}
       </div>

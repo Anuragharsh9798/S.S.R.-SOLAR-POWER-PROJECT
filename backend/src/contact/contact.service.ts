@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 
@@ -40,6 +40,34 @@ export class ContactService {
         message: 'Thank you! Your message has been received. Our team will contact you shortly.',
         messageId: id,
       };
+    }
+  }
+
+  async findAllAdmin() {
+    try {
+      return await this.prisma.contactMessage.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (err) {
+      this.logger.warn(`ContactMessage DB lookup notice: ${err.message}`);
+      return Array.from(this.inMemoryContactMessages.values());
+    }
+  }
+
+  async markHandled(id: string, isRead: boolean = true) {
+    try {
+      return await this.prisma.contactMessage.update({
+        where: { id },
+        data: { isRead },
+      });
+    } catch {
+      const existing = this.inMemoryContactMessages.get(id);
+      if (!existing) {
+        throw new NotFoundException(`Contact message with ID "${id}" not found`);
+      }
+      const updated = { ...existing, isRead, updatedAt: new Date() };
+      this.inMemoryContactMessages.set(id, updated);
+      return updated;
     }
   }
 }

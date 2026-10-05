@@ -31,16 +31,23 @@ export class GovernmentStatisticsController {
 
 @Controller('api/v1/admin/government-statistics')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.CONTENT_MANAGER)
 export class AdminGovernmentStatisticsController {
   constructor(private readonly govtStatsService: GovernmentStatisticsService) {}
 
+  @Get()
+  @Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.CONTENT_MANAGER, RoleEnum.STAFF)
+  findAllAdmin() {
+    return this.govtStatsService.findAll();
+  }
+
   @Post()
+  @Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.CONTENT_MANAGER)
   create(@Body() dto: CreateGovtStatDto, @Req() req: any) {
     return this.govtStatsService.create(dto, req.user);
   }
 
   @Patch(':id')
+  @Roles(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.CONTENT_MANAGER)
   update(
     @Param('id') id: string,
     @Body() dto: Partial<CreateGovtStatDto>,
@@ -50,6 +57,7 @@ export class AdminGovernmentStatisticsController {
   }
 
   @Delete(':id')
+  @Roles(RoleEnum.SUPER_ADMIN)
   remove(@Param('id') id: string) {
     return this.govtStatsService.remove(id);
   }

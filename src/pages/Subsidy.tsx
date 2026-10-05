@@ -87,7 +87,7 @@ export const Subsidy = () => {
       />
 
       {/* 1. HERO SECTION WITH COUNTDOWN WIDGET */}
-      <section className="relative overflow-hidden pb-16 pt-32 md:pb-24 md:pt-40">
+      <section className="relative overflow-hidden pb-10 pt-32 md:pb-14 md:pt-36">
         <div
           className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/92 to-background"
           aria-hidden
@@ -98,18 +98,18 @@ export const Subsidy = () => {
         <div className="container-wide relative">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 items-center">
             {/* Left Column: Hero Copy */}
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-7 space-y-4 md:space-y-5">
               <span className="eyebrow">
                 <Sparkles className="h-3.5 w-3.5 text-primary" /> Government Flagship Solar Scheme
               </span>
 
-              <h1 className="text-4xl leading-[1.08] font-bold text-balance md:text-5xl lg:text-6xl">
+              <h1 className="mt-3.5 text-4xl leading-[1.08] font-bold text-balance md:text-5xl lg:text-6xl">
                 PM Surya Ghar Muft Bijli Yojana: <br />
                 <span className="text-gradient">Get Up to ₹78,000 Subsidy</span>
               </h1>
 
-              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                Reduce your electricity bills by up to 90%. Eligible UP residential households get up to ₹78,000 Central Subsidy + ₹30,000 UP State Subsidy directly transferred to your bank account via DBT.
+              <p className="mt-3.5 md:mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                PM Surya Ghar: Muft Bijli Yojana is the Government of India's flagship rooftop solar initiative designed to make clean, sustainable solar electricity accessible and affordable for residential households. The scheme provides direct financial subsidies to homeowners installing grid-connected rooftop solar systems, substantially lowering initial capital expenditure while reducing monthly electricity bills by up to 90%. Eligible residential consumers can claim central and state government financial assistance credited directly to their bank accounts via Direct Benefit Transfer (DBT). SSR Solar Power assists you through every stage—from verifying property eligibility and rooftop sizing to complete National Portal registration, DISCOM net metering approvals, and smooth subsidy disbursement.
               </p>
 
               <div className="flex flex-wrap gap-4 pt-2">
@@ -121,7 +121,8 @@ export const Subsidy = () => {
                 <Button asChild variant="outline" className="rounded-full px-7 font-semibold">
                   <Link to="/calculator">Calculate Your Subsidy</Link>
                 </Button>
-              </div>            </div>
+              </div>
+            </div>
 
             {/* Right Column: Live Urgency Countdown Widget Card */}
             <div className="lg:col-span-5">
@@ -173,23 +174,23 @@ export const Subsidy = () => {
       </section>
 
       {/* 2. WHAT IS PM SURYA GHAR MUFT BIJLI YOJANA */}
-      <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
         <div className="container-wide">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             <div>
               <span className="eyebrow">Official Solar Scheme</span>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+              <h2 className="mt-3.5 text-3xl font-bold tracking-tight md:text-4xl">
                 What is <span className="text-gradient">PM Surya Ghar Muft Bijli Yojana</span>?
               </h2>
-              <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+              <p className="mt-3.5 text-base leading-relaxed text-muted-foreground">
                 Government of India's flagship rooftop solar scheme launched in February 2024 to make clean solar energy affordable for homeowners. Under this scheme, eligible residential households receive up to ₹78,000 as a direct central subsidy for installing rooftop solar systems.
               </p>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                 The subsidy amount is credited directly into your bank account through <strong className="text-foreground">Direct Benefit Transfer (DBT)</strong> after successful installation, DISCOM net-metering inspection, and commissioning.
               </p>
 
               {/* Feature Highlights Badges */}
-              <div className="mt-6 grid grid-cols-3 gap-3">
+              <div className="mt-5 grid grid-cols-3 gap-3">
                 <div className="calc-card-glow group relative transition-all duration-300">
                   <div className="calc-card-gradient-border relative rounded-2xl bg-card p-3.5 text-center shadow-soft">
                     <span className="text-xl">🚫</span>
@@ -227,7 +228,7 @@ export const Subsidy = () => {
       </MotionSection>
 
       {/* 3. WHY GO SOLAR UNDER PM SURYA GHAR SCHEME */}
-      <MotionSection animation="fadeUp" className="section">
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14">
         <div className="container-wide">
           <SectionHeading
             eyebrow="Key Benefits"
@@ -235,7 +236,7 @@ export const Subsidy = () => {
             description="Transform your roof into an independent power plant with government-backed financial subsidies."
           />
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 md:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 icon: PiggyBank,
@@ -278,8 +279,8 @@ export const Subsidy = () => {
       </MotionSection>
 
       {/* 4. PM SURYA GHAR SCHEME ACHIEVEMENTS (VERIFIED GOVERNMENT STATS) */}
-      <MotionSection animation="fadeUp" className="section bg-gradient-soft">
-        <div className="container-wide space-y-10">
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
+        <div className="container-wide space-y-7 md:space-y-8">
           <SectionHeading
             eyebrow="National Impact"
             title={<>PM Surya Ghar Scheme <span className="text-gradient">Achievements</span></>}
@@ -287,7 +288,7 @@ export const Subsidy = () => {
           />
 
           {loadingStats ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="h-48 rounded-3xl border border-border bg-card/60 p-6 animate-pulse space-y-3">
                   <div className="h-4 w-1/2 rounded bg-muted" />
@@ -319,7 +320,7 @@ export const Subsidy = () => {
             </div>
           ) : (
             /* Verified Government Statistics Grid */
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {(
                 govtStats && govtStats.filter(
                   (s: any) =>
@@ -443,7 +444,7 @@ export const Subsidy = () => {
           )}
 
           {/* Subtext Callout Banner */}
-          <div className="mt-8 calc-card-glow group relative transition-all duration-500">
+          <div className="mt-6 md:mt-7 calc-card-glow group relative transition-all duration-500">
             <div className="calc-card-gradient-border relative rounded-2xl bg-card/90 p-6 flex flex-wrap items-center justify-between gap-4 shadow-soft">
               <div className="max-w-2xl">
                 <p className="text-base font-bold text-foreground leading-snug">
@@ -467,7 +468,7 @@ export const Subsidy = () => {
       </MotionSection>
 
       {/* 5. GOVERNMENT SUBSIDY STRUCTURE TABLE */}
-      <MotionSection animation="fadeUp" className="section">
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14">
         <div className="container-wide max-w-4xl">
           <SectionHeading
             eyebrow="Financial Subsidy Rates"
@@ -475,7 +476,7 @@ export const Subsidy = () => {
             description="Clear breakdown of Central Government (PM Surya Ghar) + UP State Government subsidies for residential rooftop solar."
           />
 
-          <div className="mt-10 calc-card-glow group relative transition-all duration-500">
+          <div className="mt-7 md:mt-8 calc-card-glow group relative transition-all duration-500">
             <div className="calc-card-gradient-border relative overflow-hidden rounded-3xl bg-card shadow-card">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
@@ -524,7 +525,7 @@ export const Subsidy = () => {
       </MotionSection>
 
       {/* 6. ELIGIBILITY & REQUIRED DOCUMENTS */}
-      <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
         <div className="container-wide">
           <SectionHeading
             eyebrow="Compliance Checklist"
@@ -532,10 +533,10 @@ export const Subsidy = () => {
             description="Simple prerequisites required to claim your government rooftop subsidy."
           />
 
-          <div className="mt-14 grid gap-8 lg:grid-cols-12 items-start">
+          <div className="mt-8 md:mt-10 grid gap-6 lg:grid-cols-12 items-start">
             {/* Eligibility List */}
             <div className="lg:col-span-6 calc-card-glow group relative transition-all duration-500">
-              <div className="calc-card-gradient-border relative rounded-3xl bg-card p-7 shadow-soft space-y-4">
+              <div className="calc-card-gradient-border relative rounded-3xl bg-card p-6 md:p-7 shadow-soft space-y-4">
                 <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" /> Eligibility Criteria
                 </h3>
@@ -589,7 +590,7 @@ export const Subsidy = () => {
       </MotionSection>
 
       {/* 7. HOW TO APPLY FOR PM SURYA GHAR SUBSIDY (STEP BY STEP) */}
-      <MotionSection animation="fadeUp" className="section">
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14">
         <div className="container-wide">
           <SectionHeading
             eyebrow="Application Process"
@@ -597,9 +598,9 @@ export const Subsidy = () => {
             description="SSR Solar Power guides you through all 3 stages on the National Portal."
           />
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-3">
+          <div className="mt-8 md:mt-10 grid gap-5 sm:grid-cols-3">
             <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="calc-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-7 shadow-soft space-y-4">
+              <div className="calc-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-6 md:p-7 shadow-soft space-y-4">
                 <span className="text-3xl font-bold text-primary">01</span>
                 <div>
                   <h3 className="text-lg font-bold text-foreground">Register on National Portal</h3>
@@ -611,7 +612,7 @@ export const Subsidy = () => {
             </div>
 
             <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="calc-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-7 shadow-soft space-y-4">
+              <div className="calc-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-6 md:p-7 shadow-soft space-y-4">
                 <span className="text-3xl font-bold text-primary">02</span>
                 <div>
                   <h3 className="text-lg font-bold text-foreground">Apply for Rooftop Solar</h3>
@@ -623,7 +624,7 @@ export const Subsidy = () => {
             </div>
 
             <div className="calc-card-glow group relative transition-all duration-500">
-              <div className="calc-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-7 shadow-soft space-y-4">
+              <div className="calc-card-gradient-border relative flex flex-col justify-between h-full rounded-3xl bg-card p-6 md:p-7 shadow-soft space-y-4">
                 <span className="text-3xl font-bold text-primary">03</span>
                 <div>
                   <h3 className="text-lg font-bold text-foreground">Choose SSR Solar Power</h3>
@@ -637,17 +638,15 @@ export const Subsidy = () => {
         </div>
       </MotionSection>
 
-
-
-      {/* 9. SUBSIDY FREQUENTLY ASKED QUESTIONS */}
-      <MotionSection animation="fadeUp" className="section">
+      {/* 8. SUBSIDY FREQUENTLY ASKED QUESTIONS */}
+      <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
         <div className="container-wide max-w-4xl">
           <SectionHeading
             eyebrow="Got Questions?"
             title={<>PM Surya Ghar <span className="text-gradient">Subsidy FAQs</span></>}
           />
 
-          <div className="mt-10">
+          <div className="mt-7 md:mt-8">
             <Accordion type="single" collapsible className="w-full space-y-3">
               <AccordionItem value="item-1" className="calc-card-gradient-border relative rounded-2xl bg-card px-5 border-none shadow-soft overflow-hidden">
                 <AccordionTrigger className="text-base font-semibold py-4">What is PM Surya Ghar Muft Bijli Yojana?</AccordionTrigger>
@@ -688,15 +687,15 @@ export const Subsidy = () => {
         </div>
       </MotionSection>
 
-      {/* 10. CTA BANNER */}
-      <section className="section py-16">
+      {/* 9. CTA BANNER */}
+      <section className="section py-10 md:py-14">
         <div className="container-wide">
           <div className="calc-card-glow relative overflow-hidden rounded-3xl bg-gradient-brand p-8 text-center text-white shadow-glow md:p-12">
             <h2 className="text-3xl font-bold md:text-4xl">Claim Your Government Solar Subsidy Today!</h2>
             <p className="mt-3 text-base text-white/90 max-w-xl mx-auto">
               Let SSR Solar Power handle your feasibility approval, national portal registration, net metering, and DBT subsidy claim.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-7 md:mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button asChild className="rounded-full bg-white px-8 font-bold text-slate-900 shadow-md hover:bg-slate-100">
                 <Link to="/calculator">Get Free Consultation</Link>
               </Button>

@@ -25,8 +25,8 @@ export const TrustedBy = () => (
   </MotionSection>
 );
 
-export const StatsSection = () => (
-  <MotionSection animation="zoomIn" className="section bg-gradient-soft py-16">
+export const StatsSection = ({ className = "" }: { className?: string } = {}) => (
+  <MotionSection animation="zoomIn" className={`section bg-gradient-soft py-10 md:py-14 ${className}`}>
     <div className="container-wide grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map(({ icon: Icon, value, suffix, prefix, label }, i) => (
         <motion.div

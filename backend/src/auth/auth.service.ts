@@ -129,7 +129,7 @@ export class AuthService implements OnModuleInit {
     res.cookie('access_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: 24 * 60 * 60 * 1000,
     });
@@ -157,7 +157,7 @@ export class AuthService implements OnModuleInit {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
     });
 
@@ -186,19 +186,30 @@ export class AuthService implements OnModuleInit {
     try {
       const role = await this.prisma.role.findUnique({ where: { name: data.roleName } });
       if (role) {
-        return await this.prisma.user.create({
-          data: {
+        const dbUser = await this.prisma.user.upsert({
+          where: { email: data.email },
+          update: {
+            fullName: data.fullName,
+            phone: data.phone,
+            passwordHash,
+            roleId: role.id,
+            isActive: true,
+          },
+          create: {
             email: data.email,
             phone: data.phone,
             fullName: data.fullName,
             passwordHash,
             roleId: role.id,
+            isActive: true,
           },
           include: { role: true },
         });
+        this.inMemoryUsers.set(data.email, dbUser);
+        return dbUser;
       }
-    } catch {
-      // Memory fallback
+    } catch (err) {
+      this.logger.warn(`DB User upsert notice for ${data.email}: ${err.message}`);
     }
 
     return memUser;

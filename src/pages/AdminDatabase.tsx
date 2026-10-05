@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Layout } from "@/components/Layout";
 import { Seo } from "@/components/Seo";
 import { MotionSection } from "@/components/motion";
 import { Button } from "@/components/ui/button";
@@ -163,12 +162,15 @@ export const AdminDatabase = () => {
     setLoginSubmitting(true);
     setError(null);
     try {
-      const res = await api.post<{ user: any }>("/api/v1/auth/login", {
+      const res = await api.post<{ user: any; token?: string }>("/api/v1/auth/login", {
         email: loginEmail,
         password: loginPassword,
       });
 
       if (res && res.user) {
+        if (res.token) {
+          api.setToken(res.token);
+        }
         const role = res.user.role || res.user.roleName;
         if (role === "SUPER_ADMIN" || role === "ADMIN") {
           setIsAuthenticated(true);
@@ -178,6 +180,7 @@ export const AdminDatabase = () => {
           });
           await loadTables();
         } else {
+          api.setToken(null);
           setIsAuthenticated(false);
           setError("Access Denied: Account lacks required database management permissions.");
         }
@@ -198,9 +201,11 @@ export const AdminDatabase = () => {
     } catch {
       // Ignore
     } finally {
+      api.setToken(null);
       setIsAuthenticated(false);
       setAdminUser(null);
       setRecords([]);
+      setTables([]);
       toast.info("Logged out of Admin Portal");
     }
   };
@@ -293,15 +298,14 @@ export const AdminDatabase = () => {
   };
 
   return (
-    <Layout>
+    <div className="space-y-6">
       <Seo
         title="Controlled Database Management | SSR Solar Power Admin"
         description="Secure, audited data management portal for SSR Solar Power backend records."
         path="/admin/database"
       />
 
-      <section className="relative min-h-[85vh] pb-16 pt-28 md:pb-24 md:pt-36">
-        <div className="container-wide">
+      <div className="space-y-6">
           {/* Header */}
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border/60 pb-6">
             <div>
@@ -608,8 +612,7 @@ export const AdminDatabase = () => {
               </div>
             </div>
           )}
-        </div>
-      </section>
+      </div>
 
       {/* VIEW RECORD MODAL */}
       <Dialog open={!!viewRecord} onOpenChange={(open) => !open && setViewRecord(null)}>
@@ -721,7 +724,7 @@ export const AdminDatabase = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </div>
   );
 };
 

@@ -96,7 +96,7 @@ export const EnergyFlowSection = () => {
   const currentNodes = activeTab === "hybrid" ? hybridNodes : onGridNodes;
 
   return (
-    <section className="section relative overflow-hidden bg-background py-20">
+    <section className="section relative overflow-hidden bg-background py-10 md:py-14">
       {/* Background Ambient Glow */}
       <div aria-hidden className="blob -left-20 top-1/3 h-80 w-80 bg-primary/15" />
       <div aria-hidden className="blob -right-20 bottom-10 h-80 w-80 bg-secondary/15" />
@@ -109,7 +109,7 @@ export const EnergyFlowSection = () => {
         />
 
         {/* Flow Mode Selector Toggle */}
-        <div className="mt-8 flex justify-center gap-3">
+        <div className="mt-6 md:mt-7 flex justify-center gap-3">
           <button
             type="button"
             onClick={() => setActiveTab("hybrid")}
@@ -144,14 +144,14 @@ export const EnergyFlowSection = () => {
             transition={{ duration: 0.35, ease: "easeInOut" }}
           >
             {/* Flow Mode Heading */}
-            <div className="mt-8 text-center">
+            <div className="mt-5 md:mt-6 text-center">
               <span className="inline-block rounded-full bg-primary/10 px-4 py-1 text-xs font-bold text-primary uppercase tracking-[0.18em]">
                 {activeTab === "hybrid" ? "HYBRID SOLAR ENERGY FLOW" : "ON-GRID SOLAR ENERGY FLOW"}
               </span>
             </div>
 
             {/* Desktop & Tablet Horizontal Energy Flow Diagram */}
-            <div className="mt-12 hidden xl:flex items-center justify-between gap-2 max-w-6xl mx-auto">
+            <div className="mt-7 md:mt-8 hidden xl:flex items-center justify-between gap-2 max-w-6xl mx-auto">
               {currentNodes.map((node, i) => {
                 const Icon = node.icon;
                 const isLast = i === currentNodes.length - 1;
@@ -227,7 +227,7 @@ export const EnergyFlowSection = () => {
             </div>
 
             {/* Mobile & Tablet Vertical Flow Diagram */}
-            <div className="mt-12 flex xl:hidden flex-col items-center gap-3 max-w-sm mx-auto">
+            <div className="mt-7 md:mt-8 flex xl:hidden flex-col items-center gap-3 max-w-sm mx-auto">
               {currentNodes.map((node, i) => {
                 const Icon = node.icon;
                 const isLast = i === currentNodes.length - 1;

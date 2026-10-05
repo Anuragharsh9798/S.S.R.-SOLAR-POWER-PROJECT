@@ -1,12 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 
-export const SmoothScroll = () => {
-  const lenisRef = useRef<Lenis | null>(null);
+let globalLenis: Lenis | null = null;
 
+export const getLenis = (): Lenis | null => globalLenis;
+
+export const scrollToTop = (options?: { immediate?: boolean }) => {
+  if (globalLenis) {
+    globalLenis.scrollTo(0, {
+      immediate: options?.immediate ?? false,
+      duration: options?.immediate ? 0 : 1.2,
+    });
+  } else if (typeof window !== "undefined") {
+    window.scrollTo({
+      top: 0,
+      behavior: options?.immediate ? "instant" : "smooth",
+    });
+  }
+};
+
+export const SmoothScroll = () => {
   useEffect(() => {
-    // Initialize high-performance Lenis smooth scroll without scrollbar jittering
+    // Keep single persistent Lenis instance across navigation
+    if (globalLenis) return;
+
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -18,7 +36,7 @@ export const SmoothScroll = () => {
       syncTouch: false,
     });
 
-    lenisRef.current = lenis;
+    globalLenis = lenis;
 
     let rafId = 0;
     const raf = (time: number) => {
@@ -31,9 +49,10 @@ export const SmoothScroll = () => {
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
-      lenisRef.current = null;
+      globalLenis = null;
     };
   }, []);
 
   return null;
 };
+

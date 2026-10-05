@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { scrollToTop } from "@/components/SmoothScroll";
 import { Seo } from "@/components/Seo";
 import { CtaBanner } from "@/components/sections/CtaBanner";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
   FileText,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import { blogPosts as fallbackBlogPosts, getRelevantSolarImage } from "@/data/site";
 
 export const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -37,11 +39,19 @@ export const BlogPost = () => {
       if (data && data.title) {
         setArticle(data);
       } else {
-        setNotFound(true);
+        const fallback = fallbackBlogPosts.find((b) => b.slug === slug);
+        if (fallback) {
+          setArticle(fallback);
+        } else {
+          setNotFound(true);
+        }
       }
     } catch (err: any) {
-      console.error("Failed to fetch blog article by slug:", err);
-      if (err.statusCode === 404) {
+      console.warn("Failed to fetch blog article by slug from backend:", err);
+      const fallback = fallbackBlogPosts.find((b) => b.slug === slug);
+      if (fallback) {
+        setArticle(fallback);
+      } else if (err.statusCode === 404) {
         setNotFound(true);
       } else {
         setError(err.message || "Unable to load article content from backend server.");
@@ -53,7 +63,7 @@ export const BlogPost = () => {
 
   useEffect(() => {
     fetchArticle();
-    window.scrollTo(0, 0);
+    scrollToTop({ immediate: true });
   }, [slug]);
 
   const contentParagraphs: string[] = (() => {
@@ -182,8 +192,11 @@ export const BlogPost = () => {
               {/* Featured Image */}
               <div className="aspect-[16/9] w-full overflow-hidden rounded-3xl border border-border shadow-soft bg-muted">
                 <img
-                  src={article.featuredImage || article.image || "/images/blog/default.jpg"}
+                  src={getRelevantSolarImage(article)}
                   alt={article.title}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1000&q=80";
+                  }}
                   className="h-full w-full object-cover"
                 />
               </div>

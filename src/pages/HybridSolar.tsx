@@ -36,7 +36,8 @@ export const HybridSolar = () => (
     <PageHero
       eyebrow="PM Surya Ghar Approved Solution"
       title="Hybrid Solar Power Systems"
-      description="The ultimate solar solution combining DISCOM net-metering grid connection for up to 90% electricity bill savings + intelligent battery storage for 24x7 uninterrupted power backup during grid outages."
+      className="pb-10 md:pb-14"
+      description="Hybrid solar systems seamlessly integrate rooftop solar panels, battery storage, and the electricity grid to deliver uninterrupted clean energy and substantial utility bill savings. During daylight hours, solar energy powers your active electrical appliances first, recharges your dedicated battery bank, and exports surplus electricity to the grid through net metering. When grid outages or power interruptions occur, the intelligent hybrid inverter immediately draws from stored battery reserves to keep essential loads running without interruption. SSR Solar Power provides complete end-to-end guidance—from precise load assessment and battery capacity sizing to certified on-site installation and seamless grid synchronization."
       image={hybridSolarSystem}
     >
       <div className="flex flex-wrap gap-4">
@@ -52,20 +53,20 @@ export const HybridSolar = () => (
     </PageHero>
 
     {/* 1. What is a Hybrid Solar System? */}
-    <MotionSection animation="fadeUp" className="section">
-      <div className="container-wide grid items-center gap-12 lg:grid-cols-2">
+    <MotionSection animation="fadeUp" className="section pt-0 pb-10 md:pb-14">
+      <div className="container-wide grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
         <div>
           <span className="eyebrow">Best of Both Worlds</span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+          <h2 className="mt-3.5 text-3xl font-bold tracking-tight md:text-4xl">
             What is a <span className="text-gradient">Hybrid Solar System</span>?
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+          <p className="mt-3.5 text-base leading-relaxed text-muted-foreground">
             A <strong>Hybrid Solar System</strong> merges the net-metering bill savings of On-Grid solar with the 24x7 battery backup security of Off-Grid solar. It connects directly to your local DISCOM utility grid while seamlessly managing a dedicated solar battery bank.
           </p>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
             Under the Government's <strong>PM Surya Ghar: Muft Bijli Yojana</strong>, hybrid solar installations qualify for direct benefit transfer (DBT) subsidies of up to <strong>₹78,000</strong>. During normal hours, solar energy powers your home, charges your batteries, and exports surplus electricity to the DISCOM grid for net metering credits. When grid power fails, the hybrid inverter instantly switches to battery power in less than 10 milliseconds.
           </p>
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-5 grid grid-cols-3 gap-3">
             <div className="rounded-2xl border bg-card p-3.5 text-center shadow-soft">
               <p className="text-xl font-extrabold text-amber-500">₹78,000</p>
               <p className="text-[11px] text-muted-foreground font-medium">PM Surya Ghar Subsidy</p>
@@ -91,7 +92,7 @@ export const HybridSolar = () => (
     </MotionSection>
 
     {/* 2. PM Surya Ghar Subsidy Highlights Banner */}
-    <MotionSection animation="fadeUp" className="section py-10 bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-primary/10 border-y border-amber-500/20">
+    <MotionSection animation="fadeUp" className="section py-8 md:py-10 bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-primary/10 border-y border-amber-500/20">
       <div className="container-wide">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-start gap-4">
@@ -118,7 +119,7 @@ export const HybridSolar = () => (
     </MotionSection>
 
     {/* 3. How Hybrid Solar Works */}
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Smart Power Routing"
@@ -126,7 +127,7 @@ export const HybridSolar = () => (
           description="Intelligent 4-stage energy management prioritizing home loads, battery storage, net metering, and instant emergency backup."
         />
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 md:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               step: "01",
@@ -174,7 +175,7 @@ export const HybridSolar = () => (
     </MotionSection>
 
     {/* 4. PM Surya Ghar Subsidy Structure */}
-    <MotionSection animation="fadeUp" className="section">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Government Financial Support"
@@ -182,7 +183,7 @@ export const HybridSolar = () => (
           description="Fixed central government subsidy credited directly to your bank account via Direct Benefit Transfer (DBT)."
         />
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-8 md:mt-10 grid gap-5 md:grid-cols-3">
           <div className="calc-card-glow group relative">
             <div className="calc-card-gradient-border relative rounded-3xl bg-card p-6 text-center space-y-3">
               <span className="inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600">
@@ -220,7 +221,7 @@ export const HybridSolar = () => (
     </MotionSection>
 
     {/* 5. Key System Components */}
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
       <div className="container-wide">
         <SectionHeading
           eyebrow="Tier-1 Equipment"
@@ -228,7 +229,7 @@ export const HybridSolar = () => (
           description="Built with high-efficiency mono PERC panels, smart hybrid inverters, and long-life lithium/tubular solar batteries."
         />
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 md:mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {[
             {
               icon: Sun,
@@ -266,7 +267,7 @@ export const HybridSolar = () => (
     </MotionSection>
 
     {/* 6. System Comparison: Hybrid vs On-Grid */}
-    <MotionSection animation="fadeUp" className="section">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14">
       <div className="container-wide max-w-4xl">
         <SectionHeading
           eyebrow="Feature Comparison"
@@ -274,7 +275,7 @@ export const HybridSolar = () => (
           description="See why Hybrid Solar is the ultimate choice for uninterrupted power and maximum savings."
         />
 
-        <div className="mt-10 overflow-x-auto">
+        <div className="mt-7 md:mt-8 overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
               <tr className="border-b border-border bg-card/50">
@@ -311,14 +312,14 @@ export const HybridSolar = () => (
     </MotionSection>
 
     {/* 7. FAQs */}
-    <MotionSection animation="fadeUp" className="section bg-gradient-soft">
+    <MotionSection animation="fadeUp" className="section py-10 md:py-14 bg-gradient-soft">
       <div className="container-wide max-w-4xl">
         <SectionHeading
           eyebrow="Got Questions?"
           title={<>Hybrid Solar <span className="text-gradient">FAQs</span></>}
         />
 
-        <div className="mt-10">
+        <div className="mt-7 md:mt-8">
           <Accordion type="single" collapsible className="w-full space-y-3">
             <AccordionItem value="item-1" className="calc-card-gradient-border relative rounded-2xl bg-card px-5 border-none shadow-soft overflow-hidden">
               <AccordionTrigger className="text-base font-semibold">
