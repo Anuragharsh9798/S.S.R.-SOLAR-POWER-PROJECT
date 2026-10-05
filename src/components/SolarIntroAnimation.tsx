@@ -140,11 +140,11 @@ export const SolarIntroAnimation = () => {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.01 }}
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0] }}
-          className="fixed inset-0 z-[9999999] h-[100dvh] max-h-[100dvh] w-screen max-w-full overflow-hidden bg-slate-950 text-white select-none pointer-events-auto flex flex-col justify-between"
-          style={{ width: "100vw", maxWidth: "100vw", height: "100dvh" }}
+          className="fixed inset-0 z-[9999999] h-[100dvh] max-h-[100dvh] w-full max-w-full overflow-hidden bg-slate-950 text-white select-none pointer-events-auto flex flex-col justify-between"
+          style={{ width: "100%", maxWidth: "100vw", height: "100dvh" }}
         >
           {/* UNIFIED CONTINUOUS SYSTEM CANVAS */}
-          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none max-w-full max-h-full">
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none w-full h-full max-w-full max-h-full">
             <motion.div
               initial={{ scale: 1.03, y: 0 }}
               animate={{ scale: 1.0, y: -4 }}
@@ -179,9 +179,9 @@ export const SolarIntroAnimation = () => {
             </motion.div>
 
             {/* ========================================================================= */}
-            {/* DESKTOP SVG VISUAL LAYER (1000 x 800 COORDINATE SYSTEM)                   */}
+            {/* DESKTOP SOLAR GRID & VISUAL LAYER (1000 x 800 DESKTOP VIEWBOX)            */}
             {/* ========================================================================= */}
-            <div className="hidden md:block absolute inset-0 pointer-events-none z-10 overflow-hidden">
+            <div className="hidden md:block absolute inset-0 pointer-events-none z-10 overflow-hidden w-full h-full">
               <svg
                 viewBox="0 0 1000 800"
                 preserveAspectRatio="xMidYMid slice"
@@ -390,9 +390,9 @@ export const SolarIntroAnimation = () => {
             </div>
 
             {/* ========================================================================= */}
-            {/* MOBILE PORTRAIT SVG VISUAL LAYER (390 x 800 ZERO-OVERFLOW COORDINATES)    */}
+            {/* MOBILE SOLAR GRID & ENERGY LAYER (RESPONSIVE 390 x 800 ZERO-OVERFLOW GRID) */}
             {/* ========================================================================= */}
-            <div className="block md:hidden absolute inset-0 pointer-events-none z-10 overflow-hidden">
+            <div className="block md:hidden absolute inset-0 pointer-events-none z-10 overflow-hidden w-full h-full max-w-full max-h-full">
               <svg
                 viewBox="0 0 390 800"
                 preserveAspectRatio="xMidYMid slice"
@@ -444,7 +444,19 @@ export const SolarIntroAnimation = () => {
                   </radialGradient>
                 </defs>
 
-                {/* Stage 1 & 2: Mobile Sunlight Rays */}
+                {/* Subtle Mobile Blueprint Solar Coordinate Grid Lines */}
+                <g stroke="#FDE047" strokeWidth="0.75" strokeOpacity="0.08">
+                  {/* Vertical Column Grid Lines */}
+                  {[0, 65, 130, 195, 260, 325, 390].map((x) => (
+                    <line key={`v-grid-${x}`} x1={x} y1="0" x2={x} y2="800" strokeDasharray="3 6" />
+                  ))}
+                  {/* Horizontal Row Grid Lines */}
+                  {[0, 120, 240, 360, 480, 600, 720, 800].map((y) => (
+                    <line key={`h-grid-${y}`} x1="0" y1={y} x2="390" y2={y} strokeDasharray="3 6" />
+                  ))}
+                </g>
+
+                {/* Stage 1 & 2: Mobile Sunlight Rays from Sun Node (30, 50) */}
                 <motion.polygon
                   points="25,45 55,50 290,240 230,255"
                   fill="url(#mobSoftRay)"
@@ -478,7 +490,7 @@ export const SolarIntroAnimation = () => {
                   />
                 ))}
 
-                {/* Stage 3: Mobile Panel Busbars (Anchored on Rooftop) */}
+                {/* Stage 3: Mobile Panel Silicon Busbar Grid (Bounded on Rooftop) */}
                 {progressStage >= 1 && (
                   <>
                     {[
@@ -506,7 +518,7 @@ export const SolarIntroAnimation = () => {
                   </>
                 )}
 
-                {/* Stage 4: Mobile DC Conduit (Panels -> Inverter) */}
+                {/* Stage 4: Mobile DC Conduit Flow (Panels -> Inverter) */}
                 {progressStage >= 2 && (
                   <>
                     <path
@@ -544,7 +556,7 @@ export const SolarIntroAnimation = () => {
                   />
                 )}
 
-                {/* Stage 6: Mobile Living Room Fixture & Bulb Glow */}
+                {/* Stage 6: Mobile Living Room Fixture & Bulb Glow Node */}
                 <line
                   x1="140"
                   y1="370"
@@ -638,12 +650,12 @@ export const SolarIntroAnimation = () => {
             </AnimatePresence>
           </div>
 
-          {/* BOTTOM STEP PROGRESS TRACKER */}
+          {/* BOTTOM STEP PROGRESS TRACKER (ZERO HORIZONTAL OVERFLOW) */}
           <div className="relative z-30 px-3.5 py-2.5 sm:px-6 sm:py-4 md:px-8 md:py-6 w-full max-w-4xl mx-auto flex flex-col items-center gap-2 sm:gap-3 shrink-0">
-            {/* 6 Stage Continuous Progress Bars */}
-            <div className="grid grid-cols-6 gap-1 sm:gap-2.5 md:gap-3 w-full max-w-3xl">
+            {/* 6 Stage Continuous Progress Bars Grid */}
+            <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5 md:gap-3 w-full max-w-3xl min-w-0">
               {STAGES.map((s, idx) => (
-                <div key={s.id} className="w-full flex flex-col items-center gap-1">
+                <div key={s.id} className="w-full min-w-0 flex flex-col items-center gap-1">
                   <div className="w-full h-1 sm:h-1.5 md:h-2 rounded-full bg-white/25 overflow-hidden backdrop-blur-sm">
                     <motion.div
                       className="h-full bg-gradient-to-r from-amber-400 to-emerald-400"
