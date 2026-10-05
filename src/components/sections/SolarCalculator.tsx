@@ -413,7 +413,7 @@ export const SolarCalculator = ({ heading = true, className = "" }: { heading?: 
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="bill">Monthly Electricity Bill (₹)</Label>
+                  <Label htmlFor="bill">Monthly Bill (₹)</Label>
                   <Input
                     id="bill"
                     type="number"
@@ -425,7 +425,7 @@ export const SolarCalculator = ({ heading = true, className = "" }: { heading?: 
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="units">Monthly Electricity Consumption (units)</Label>
+                  <Label htmlFor="units">Monthly Units (units)</Label>
                   <Input
                     id="units"
                     type="number"
@@ -437,7 +437,7 @@ export const SolarCalculator = ({ heading = true, className = "" }: { heading?: 
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="rate">Electricity Rate (₹/unit)</Label>
+                  <Label htmlFor="rate">Monthly Rate (₹/unit)</Label>
                   <Input
                     id="rate"
                     type="number"

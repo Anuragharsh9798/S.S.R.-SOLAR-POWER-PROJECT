@@ -271,7 +271,7 @@ const Contact = () => {
                           id="contact-fullName"
                           type="text"
                           required
-                          placeholder="e.g., Rajesh Sharma"
+                          placeholder="e.g. A*** K****"
                           value={formData.fullName}
                           onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
                           className="rounded-xl border-border bg-muted/40 text-sm"
@@ -287,7 +287,7 @@ const Contact = () => {
                           id="contact-email"
                           type="email"
                           required
-                          placeholder="rajesh@example.com"
+                          placeholder="e.g. name@example.com"
                           value={formData.email}
                           onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
                           className="rounded-xl border-border bg-muted/40 text-sm"

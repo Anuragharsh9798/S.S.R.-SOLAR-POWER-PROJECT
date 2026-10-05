@@ -207,7 +207,7 @@ export const ReferAndEarn = () => {
                         <Input
                           id="yourName"
                           required
-                          placeholder="e.g. Rahul Sharma"
+                          placeholder="e.g. A*** K****"
                           value={formData.yourName}
                           onChange={(e) => setFormData({ ...formData, yourName: e.target.value })}
                           className="h-10 rounded-xl"
@@ -222,7 +222,7 @@ export const ReferAndEarn = () => {
                           id="yourMobile"
                           type="tel"
                           required
-                          placeholder="+91 98765 43210"
+                          placeholder="e.g. +91 XXXXX XXXXX"
                           value={formData.yourMobile}
                           onChange={(e) => setFormData({ ...formData, yourMobile: e.target.value })}
                           className="h-10 rounded-xl"
@@ -236,7 +236,7 @@ export const ReferAndEarn = () => {
                         <Input
                           id="friendName"
                           required
-                          placeholder="e.g. Amit Verma"
+                          placeholder="e.g. A*** K****"
                           value={formData.friendName}
                           onChange={(e) => setFormData({ ...formData, friendName: e.target.value })}
                           className="h-10 rounded-xl"
@@ -251,7 +251,7 @@ export const ReferAndEarn = () => {
                           id="friendMobile"
                           type="tel"
                           required
-                          placeholder="+91 98765 00000"
+                          placeholder="e.g. +91 XXXXX XXXXX"
                           value={formData.friendMobile}
                           onChange={(e) => setFormData({ ...formData, friendMobile: e.target.value })}
                           className="h-10 rounded-xl"
@@ -265,7 +265,7 @@ export const ReferAndEarn = () => {
                         <Input
                           id="friendCity"
                           required
-                          placeholder="e.g. Mau, Lucknow, Varanasi"
+                          placeholder="e.g. Greater Noida"
                           value={formData.friendCity}
                           onChange={(e) => setFormData({ ...formData, friendCity: e.target.value })}
                           className="h-10 rounded-xl"

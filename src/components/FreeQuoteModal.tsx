@@ -346,7 +346,7 @@ export const FreeQuoteModal = () => {
                       <Input
                         id="modalFullName"
                         required
-                        placeholder="e.g. Rahul Sharma"
+                        placeholder="e.g. A*** K****"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         className="h-8.5 text-xs rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500"
@@ -361,7 +361,7 @@ export const FreeQuoteModal = () => {
                         id="modalMobile"
                         type="tel"
                         required
-                        placeholder="+91 98765 43210"
+                        placeholder="e.g. +91 XXXXX XXXXX"
                         value={formData.mobile}
                         onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                         className="h-8.5 text-xs rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500"
@@ -377,7 +377,7 @@ export const FreeQuoteModal = () => {
                     <Input
                       id="modalEmail"
                       type="email"
-                      placeholder="you@email.com"
+                      placeholder="e.g. name@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="h-8.5 text-xs rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500"
@@ -486,7 +486,7 @@ export const FreeQuoteModal = () => {
                         <Input
                           id="modalAddress"
                           required
-                          placeholder="e.g. House No, Locality, City, State, PIN"
+                          placeholder="e.g. House No. XX, Locality, City, State, PIN"
                           value={formData.address}
                           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                           className="h-8 text-xs rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500"
@@ -500,7 +500,7 @@ export const FreeQuoteModal = () => {
                           </Label>
                           <Input
                             id="modalHouseNumber"
-                            placeholder="e.g. 275, Block A"
+                            placeholder="e.g. XX, Block A"
                             value={formData.houseNumber}
                             onChange={(e) => setFormData({ ...formData, houseNumber: e.target.value })}
                             className="h-7.5 text-[11px] rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500 px-2"
@@ -513,7 +513,7 @@ export const FreeQuoteModal = () => {
                           </Label>
                           <Input
                             id="modalArea"
-                            placeholder="e.g. Beta 1, Sector 20"
+                            placeholder="e.g. Area Name, Sector XX"
                             value={formData.area}
                             onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                             className="h-7.5 text-[11px] rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500 px-2"
@@ -565,7 +565,7 @@ export const FreeQuoteModal = () => {
                           </Label>
                           <Input
                             id="modalPin"
-                            placeholder="e.g. 201308"
+                            placeholder="e.g. XXXXXX"
                             value={formData.pin}
                             onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
                             className="h-7.5 text-[11px] rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500 px-2"
@@ -579,7 +579,7 @@ export const FreeQuoteModal = () => {
                   <div className="grid grid-cols-3 gap-2 pt-1">
                     <div className="space-y-0.5">
                       <Label htmlFor="modalMonthlyBill" className="text-[10px] font-bold text-slate-200">
-                        Bill (₹)
+                        Monthly Bill (₹)
                       </Label>
                       <Input
                         id="modalMonthlyBill"
@@ -594,7 +594,7 @@ export const FreeQuoteModal = () => {
 
                     <div className="space-y-0.5">
                       <Label htmlFor="modalUnits" className="text-[10px] font-bold text-slate-200">
-                        Units (kWh)
+                        Monthly Units (kWh)
                       </Label>
                       <Input
                         id="modalUnits"
@@ -609,7 +609,7 @@ export const FreeQuoteModal = () => {
 
                     <div className="space-y-0.5">
                       <Label htmlFor="modalRate" className="text-[10px] font-bold text-slate-200">
-                        Rate (₹/unit)
+                        Monthly Rate (₹/unit)
                       </Label>
                       <Input
                         id="modalRate"

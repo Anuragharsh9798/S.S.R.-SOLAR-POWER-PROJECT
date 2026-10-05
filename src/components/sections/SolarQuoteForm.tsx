@@ -278,7 +278,7 @@ export const SolarQuoteForm = ({
                 <Input
                   id="fullName"
                   required
-                  placeholder="e.g. Rahul Sharma"
+                  placeholder="e.g. A*** K****"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="h-10 text-xs rounded-xl"
@@ -294,7 +294,7 @@ export const SolarQuoteForm = ({
                   id="mobile"
                   type="tel"
                   required
-                  placeholder="+91 98765 43210"
+                  placeholder="e.g. +91 XXXXX XXXXX"
                   value={formData.mobile}
                   onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                   className="h-10 text-xs rounded-xl"
@@ -309,7 +309,7 @@ export const SolarQuoteForm = ({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="rahul@example.com"
+                  placeholder="e.g. name@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="h-10 text-xs rounded-xl"
@@ -418,7 +418,7 @@ export const SolarQuoteForm = ({
                     <Input
                       id="address"
                       required
-                      placeholder="e.g. House No, Locality, City, State, PIN"
+                      placeholder="e.g. House No. XX, Locality, City, State, PIN"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       className="h-9.5 text-xs rounded-xl"
@@ -431,7 +431,7 @@ export const SolarQuoteForm = ({
                     </Label>
                     <Input
                       id="houseNumber"
-                      placeholder="e.g. 275, Block A"
+                      placeholder="e.g. XX, Block A"
                       value={formData.houseNumber}
                       onChange={(e) => setFormData({ ...formData, houseNumber: e.target.value })}
                       className="h-9 text-xs rounded-xl"
@@ -444,7 +444,7 @@ export const SolarQuoteForm = ({
                     </Label>
                     <Input
                       id="area"
-                      placeholder="e.g. Beta 1, Sector 20"
+                      placeholder="e.g. Area Name, Sector XX"
                       value={formData.area}
                       onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                       className="h-9 text-xs rounded-xl"
@@ -496,7 +496,7 @@ export const SolarQuoteForm = ({
                     </Label>
                     <Input
                       id="pin"
-                      placeholder="e.g. 201308"
+                      placeholder="e.g. XXXXXX"
                       value={formData.pin}
                       onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
                       className="h-9 text-xs rounded-xl"
@@ -524,7 +524,7 @@ export const SolarQuoteForm = ({
               {/* Monthly Electricity Consumption (Units) */}
               <div className="space-y-1.5">
                 <Label htmlFor="units" className="text-xs font-medium text-foreground">
-                  Consumption (Units)
+                  Monthly Units (kWh)
                 </Label>
                 <Input
                   id="units"
@@ -540,7 +540,7 @@ export const SolarQuoteForm = ({
               {/* Electricity Rate (₹/unit) */}
               <div className="space-y-1.5">
                 <Label htmlFor="rate" className="text-xs font-medium text-foreground">
-                  Rate (₹/unit)
+                  Monthly Rate (₹/unit)
                 </Label>
                 <Input
                   id="rate"
