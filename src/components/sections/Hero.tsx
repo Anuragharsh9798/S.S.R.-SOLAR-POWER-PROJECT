@@ -39,9 +39,7 @@ export const Hero = () => {
       {/* Parallax & Floating Hero Looping Solar Video Background */}
       <motion.div
         style={{ y: bgY, translateY: mouseY, x: mouseX, scale: bgScale }}
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 h-full w-full will-change-transform overflow-hidden"
+        className="absolute inset-0 h-full w-full will-change-transform overflow-hidden pointer-events-none"
       >
         <video
           autoPlay

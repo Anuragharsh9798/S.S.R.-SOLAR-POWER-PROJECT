@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Zap, Cpu, Lightbulb, ArrowRight, Sparkles, Compass } from "lucide-react";
 import { BrandWordmark } from "./BrandWordmark";
+import { pauseLenis, resumeLenis } from "./SmoothScroll";
 
 // Photorealistic Residential Solar Canvas
 import homeFlowCanvas from "@/assets/intro-4-energy-flow.jpg";
@@ -56,6 +57,25 @@ export const SolarIntroAnimation = () => {
   const [mounted, setMounted] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [progressStage, setProgressStage] = useState<number>(0);
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
+
+  const handleFinish = useCallback(() => {
+    // Clear all pending progression timers immediately
+    timersRef.current.forEach((t) => clearTimeout(t));
+    timersRef.current = [];
+
+    try {
+      sessionStorage.setItem("ssr_solar_intro_viewed", "true");
+    } catch {
+      // Ignore storage restrictions
+    }
+
+    if (typeof document !== "undefined") {
+      document.body.style.overflow = "";
+    }
+    resumeLenis();
+    setIsVisible(false);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -71,14 +91,20 @@ export const SolarIntroAnimation = () => {
       const alreadySeen = sessionStorage.getItem("ssr_solar_intro_viewed");
       if (!alreadySeen) {
         setIsVisible(true);
-        document.body.style.overflow = "hidden";
+        if (typeof document !== "undefined") {
+          document.body.style.overflow = "hidden";
+        }
+        pauseLenis();
       }
     } catch (e) {
       console.warn("Storage check exception:", e);
     }
 
     return () => {
-      document.body.style.overflow = "";
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "";
+      }
+      resumeLenis();
     };
   }, []);
 
@@ -86,34 +112,21 @@ export const SolarIntroAnimation = () => {
   useEffect(() => {
     if (!isVisible) return;
 
-    const t1 = setTimeout(() => setProgressStage(1), 900);   // Sunlight Captured
-    const t2 = setTimeout(() => setProgressStage(2), 1800);  // Energy Generated
-    const t3 = setTimeout(() => setProgressStage(3), 2700);  // Electricity Flow
-    const t4 = setTimeout(() => setProgressStage(4), 3600);  // Smart Conversion
-    const t5 = setTimeout(() => setProgressStage(5), 4500);  // Home Powered (Visual Climax)
-    const t6 = setTimeout(() => {
-      handleFinish();
-    }, 5500); // Smooth dissolve into homepage
+    timersRef.current.forEach((t) => clearTimeout(t));
+    timersRef.current = [];
+
+    timersRef.current.push(setTimeout(() => setProgressStage(1), 900));   // Sunlight Captured
+    timersRef.current.push(setTimeout(() => setProgressStage(2), 1800));  // Energy Generated
+    timersRef.current.push(setTimeout(() => setProgressStage(3), 2700));  // Electricity Flow
+    timersRef.current.push(setTimeout(() => setProgressStage(4), 3600));  // Smart Conversion
+    timersRef.current.push(setTimeout(() => setProgressStage(5), 4500));  // Home Powered (Visual Climax)
+    timersRef.current.push(setTimeout(() => handleFinish(), 5500));       // Smooth dissolve into homepage
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
-      clearTimeout(t5);
-      clearTimeout(t6);
+      timersRef.current.forEach((t) => clearTimeout(t));
+      timersRef.current = [];
     };
-  }, [isVisible]);
-
-  const handleFinish = () => {
-    try {
-      sessionStorage.setItem("ssr_solar_intro_viewed", "true");
-    } catch (e) {
-      // Ignore storage restrictions
-    }
-    document.body.style.overflow = "";
-    setIsVisible(false);
-  };
+  }, [isVisible, handleFinish]);
 
   if (!mounted || !isVisible) return null;
 
@@ -126,21 +139,22 @@ export const SolarIntroAnimation = () => {
           key="continuous-solar-intro-overlay"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.01 }}
-          transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1.0] }}
-          className="fixed inset-0 z-[9999999] h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] flex flex-col justify-between overflow-hidden bg-slate-950 text-white select-none pointer-events-auto"
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0] }}
+          className="fixed inset-0 z-[9999999] h-[100dvh] max-h-[100dvh] w-screen max-w-full overflow-hidden bg-slate-950 text-white select-none pointer-events-auto flex flex-col justify-between"
+          style={{ width: "100vw", maxWidth: "100vw", height: "100dvh" }}
         >
           {/* UNIFIED CONTINUOUS SYSTEM CANVAS */}
-          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none max-w-full max-h-full">
             <motion.div
-              initial={{ scale: 1.04, y: 0 }}
-              animate={{ scale: 1.0, y: -6 }}
+              initial={{ scale: 1.03, y: 0 }}
+              animate={{ scale: 1.0, y: -4 }}
               transition={{ duration: 5.5, ease: "easeOut" }}
-              className="absolute inset-0 h-full w-full"
+              className="absolute inset-0 h-full w-full will-change-transform"
             >
               <img
                 src={homeFlowCanvas}
                 alt="SSR Solar Power Continuous Solar Energy Journey"
-                className="h-full w-full object-cover object-[65%_center] md:object-center brightness-[0.93] contrast-[1.05]"
+                className="h-full w-full object-cover object-[66%_center] md:object-center brightness-[0.93] contrast-[1.05]"
               />
 
               {/* Natural Atmospheric Daybreak Lighting Transition */}
@@ -149,7 +163,7 @@ export const SolarIntroAnimation = () => {
                 animate={{
                   background:
                     progressStage === 0
-                      ? "linear-gradient(180deg, rgba(2,6,23,0.72) 0%, rgba(15,23,42,0.2) 50%, rgba(2,6,23,0.85) 100%)"
+                      ? "linear-gradient(180deg, rgba(2,6,23,0.72) 0%, rgba(15,23,42,0.18) 50%, rgba(2,6,23,0.85) 100%)"
                       : progressStage <= 2
                       ? "linear-gradient(180deg, rgba(2,6,23,0.52) 0%, rgba(245,158,11,0.1) 40%, rgba(2,6,23,0.78) 100%)"
                       : "linear-gradient(180deg, rgba(2,6,23,0.48) 0%, rgba(16,185,129,0.08) 50%, rgba(2,6,23,0.85) 100%)",
@@ -159,7 +173,7 @@ export const SolarIntroAnimation = () => {
 
               {/* Readability Vignette */}
               <div
-                className="absolute inset-0 bg-gradient-to-t from-slate-950/92 via-transparent to-slate-950/75"
+                className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/75"
                 aria-hidden
               />
             </motion.div>
@@ -168,17 +182,6 @@ export const SolarIntroAnimation = () => {
             {/* DESKTOP SVG VISUAL LAYER (1000 x 800 COORDINATE SYSTEM)                   */}
             {/* ========================================================================= */}
             <div className="hidden md:block absolute inset-0 pointer-events-none z-10 overflow-hidden">
-              {/* Sun Corona */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{
-                  opacity: progressStage <= 2 ? [0.45, 0.75, 0.55] : 0.35,
-                  scale: progressStage <= 2 ? [1.0, 1.15, 1.05] : 1.05,
-                }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-10 -left-10 h-[480px] w-[480px] rounded-full bg-amber-400/25 blur-[110px]"
-              />
-
               <svg
                 viewBox="0 0 1000 800"
                 preserveAspectRatio="xMidYMid slice"
@@ -381,33 +384,21 @@ export const SolarIntroAnimation = () => {
                       opacity: progressStage >= 5 ? [0.55, 0.85, 0.7] : [0.2, 0.4, 0.25],
                     }}
                     transition={{ duration: 1.3, ease: "easeOut", repeat: Infinity, repeatType: "reverse" }}
-                    className="blur-[8px]"
                   />
                 )}
               </svg>
             </div>
 
             {/* ========================================================================= */}
-            {/* MOBILE PORTRAIT SVG VISUAL LAYER (390 x 800 BALANCED COORDINATES)        */}
+            {/* MOBILE PORTRAIT SVG VISUAL LAYER (390 x 800 ZERO-OVERFLOW COORDINATES)    */}
             {/* ========================================================================= */}
             <div className="block md:hidden absolute inset-0 pointer-events-none z-10 overflow-hidden">
-              {/* Mobile Sun Glow */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{
-                  opacity: progressStage <= 2 ? [0.4, 0.7, 0.5] : 0.3,
-                  scale: progressStage <= 2 ? [1.0, 1.15, 1.05] : 1.05,
-                }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-6 -left-6 h-48 w-48 rounded-full bg-amber-400/25 blur-[50px]"
-              />
-
               <svg
                 viewBox="0 0 390 800"
                 preserveAspectRatio="xMidYMid slice"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="absolute inset-0 w-full h-full"
+                className="absolute inset-0 w-full h-full max-w-full max-h-full"
                 style={{ mixBlendMode: "screen" }}
               >
                 <defs>
@@ -582,7 +573,6 @@ export const SolarIntroAnimation = () => {
                       opacity: progressStage >= 5 ? [0.55, 0.85, 0.7] : [0.2, 0.4, 0.25],
                     }}
                     transition={{ duration: 1.3, ease: "easeOut", repeat: Infinity, repeatType: "reverse" }}
-                    className="blur-[6px]"
                   />
                 )}
               </svg>
@@ -617,7 +607,7 @@ export const SolarIntroAnimation = () => {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               aria-label="Skip solar introduction"
-              className="group flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/30 bg-black/60 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all hover:bg-black/80 hover:border-amber-400/60 active:scale-95 cursor-pointer shadow-soft shrink-0 ml-2"
+              className="group flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/30 bg-black/60 px-3.5 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all hover:bg-black/80 hover:border-amber-400/60 active:scale-95 cursor-pointer shadow-soft shrink-0 ml-2"
             >
               <span>Skip Intro</span>
               <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform group-hover:translate-x-1" />
