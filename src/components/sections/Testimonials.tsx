@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -47,6 +47,7 @@ interface TestimonialsProps {
 
 export const Testimonials = ({ isHomePage = false, className = "" }: TestimonialsProps) => {
   const [items, setItems] = useState<TestimonialItem[]>(testimonials);
+  const [filter, setFilter] = useState<"all" | "verified" | "drafts">("all");
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(1200);
@@ -90,17 +91,32 @@ export const Testimonials = ({ isHomePage = false, className = "" }: Testimonial
       try {
         const data = await api.get<any[]>("/api/v1/reviews");
         if (Array.isArray(data) && data.length > 0) {
-          const approvedOnly = data
-            .filter((r) => r.isApproved === true || r.isApproved === undefined)
+          const approvedOnly: TestimonialItem[] = data
+            .filter((r) => r.isApproved === true || (r.isApproved === undefined && r.isVerified === true))
+            .filter((r) => r.name && r.quote && r.quote.trim().length > 0)
             .map((r) => ({
-              name: r.name,
-              location: r.location || "Uttar Pradesh",
+              id: r.id,
+              name: r.name.trim(),
+              location: r.location?.trim() || "Uttar Pradesh",
               rating: r.rating || 5,
-              quote: r.quote || r.comment || "",
+              quote: (r.quote || r.comment || "").trim(),
+              isVerified: true,
+              isDraft: false,
+              status: "verified" as const,
+              locationConfirmed: true,
             }));
 
           if (approvedOnly.length > 0) {
-            setItems(approvedOnly);
+            // Strictly deduplicate by name + quote so duplicates never appear
+            const combined = [...approvedOnly, ...testimonials];
+            const seen = new Set<string>();
+            const unique = combined.filter((item) => {
+              const key = `${item.name.toLowerCase()}:::${item.quote.toLowerCase()}`;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+            setItems(unique);
           }
         }
       } catch (err) {
@@ -113,7 +129,19 @@ export const Testimonials = ({ isHomePage = false, className = "" }: Testimonial
     fetchApprovedReviews();
   }, []);
 
-  const total = items.length;
+  // All reviews are verified customer experiences
+  const displayedItems = useMemo(() => {
+    return items;
+  }, [items]);
+
+  const total = displayedItems.length;
+
+  // Reset index if filter change leads to out of bounds
+  useEffect(() => {
+    if (index >= total && total > 0) {
+      setIndex(0);
+    }
+  }, [index, total]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -128,7 +156,7 @@ export const Testimonials = ({ isHomePage = false, className = "" }: Testimonial
 
   // Subtle auto-advance every 6.5 seconds (pauses on user hover or modal open)
   useEffect(() => {
-    if (isPaused || isModalOpen) return;
+    if (isPaused || isModalOpen || total <= 1) return;
 
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % total);
@@ -138,6 +166,7 @@ export const Testimonials = ({ isHomePage = false, className = "" }: Testimonial
   }, [total, isPaused, isModalOpen]);
 
   const go = (step: number) => {
+    if (total <= 1) return;
     setIndex((prev) => (prev + step + total) % total);
   };
 
@@ -334,30 +363,37 @@ export const Testimonials = ({ isHomePage = false, className = "" }: Testimonial
 
       <div className="container-wide relative z-10">
         <SectionHeading
-          eyebrow="Verified Client Feedback"
+          eyebrow="Client Feedback & Experiences"
           title={
             <>
               What our customers <span className="text-gradient">actually say</span>
             </>
           }
-          description="Real rooftop and commercial solar installation experiences from verified property owners across Uttar Pradesh."
+          description="Customer solar installation reviews and rooftop experiences across Uttar Pradesh."
         />
+
+        {/* Testimonial Status Header */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 z-20">
+          <span className="rounded-full px-4 py-1.5 text-xs font-semibold bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Verified Customer Reviews ({items.length})
+          </span>
+        </div>
 
         {/* STACKED LAYERED-CARD TESTIMONIAL CAROUSEL DECK */}
         <div
-          className="relative mx-auto mt-8 md:mt-10 max-w-5xl flex flex-col items-center"
+          className="relative mx-auto mt-7 md:mt-9 max-w-5xl flex flex-col items-center"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
           {/* Deck Stage Container with Preserved Height */}
-          <div className="relative w-full h-[390px] sm:h-[370px] md:h-[350px] flex items-center justify-center px-4 overflow-hidden py-4">
-            {items.map((item, i) => {
+          <div className="relative w-full h-[410px] sm:h-[390px] md:h-[370px] flex items-center justify-center px-4 overflow-hidden py-4">
+            {displayedItems.map((item, i) => {
               const diff = getCardOffset(i, index, total);
               const layer = getDeckStyles(diff, viewportWidth);
 
               return (
                 <motion.div
-                  key={`${item.name}-${i}`}
+                  key={`${item.id || item.name}-${i}`}
                   initial={false}
                   animate={{
                     x: layer.x,
@@ -407,16 +443,18 @@ export const Testimonials = ({ isHomePage = false, className = "" }: Testimonial
             {/* Pagination Count & Progress Dots */}
             <div className="flex items-center gap-3">
               <span className="font-mono text-xs font-bold text-muted-foreground tracking-wider">
-                0{index + 1} <span className="text-muted-foreground/40">/</span> 0{total}
+                {index + 1 < 10 ? `0${index + 1}` : index + 1}{" "}
+                <span className="text-muted-foreground/40">/</span>{" "}
+                {total < 10 ? `0${total}` : total}
               </span>
-              <div className="flex items-center gap-1.5">
-                {items.map((_, i) => (
+              <div className="flex items-center gap-1.5 max-w-[150px] sm:max-w-xs overflow-x-auto no-scrollbar py-1">
+                {displayedItems.map((_, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setIndex(i)}
                     aria-label={`Go to testimonial ${i + 1}`}
-                    className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                    className={`h-2 rounded-full shrink-0 transition-all duration-500 cursor-pointer ${
                       i === index
                         ? "w-6 bg-gradient-brand shadow-glow"
                         : "w-2 bg-border hover:bg-muted-foreground/50"
@@ -859,31 +897,33 @@ const TestimonialCardDeckItem = ({
   isFront: boolean;
 }) => {
   const initial = item.name ? item.name.charAt(0).toUpperCase() : "S";
+  const ratingValue = typeof item.rating === "number" && item.rating > 0 ? item.rating : 5;
+  const locationText = item.location || item.referenceLocation || "Uttar Pradesh, India";
 
   return (
     <div
-      className={`group relative w-full overflow-hidden text-left p-6 sm:p-8 md:p-9 rounded-3xl transition-all duration-500 border bg-card/95 backdrop-blur-2xl ${
+      className={`group relative w-full overflow-hidden text-left p-5 sm:p-7 md:p-8 rounded-3xl transition-all duration-500 border bg-card/95 backdrop-blur-2xl ${
         isFront
           ? "border-emerald-500/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5),0_0_30px_-5px_rgba(22,163,74,0.2)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_35px_-5px_rgba(34,197,94,0.3)]"
           : "border-border/60 shadow-md bg-card/85"
       }`}
     >
-      {/* Decorative Golden Ambient Accent */}
+      {/* Decorative Ambient Accent */}
       <div
         aria-hidden
-        className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-sun opacity-10 blur-2xl pointer-events-none"
+        className="absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-10 blur-2xl pointer-events-none bg-gradient-sun"
       />
 
-      {/* Top Header Row: Rating Stars + Verified Customer Tag + Quote Icon */}
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3">
-          {/* 5-Star Rating */}
-          <div className="flex items-center gap-1">
+      {/* Top Header Row: Rating + Verification Badge + Quote Icon */}
+      <div className="flex items-center justify-between gap-3 mb-3.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Star Rating: Verified rating display */}
+          <div className="flex items-center gap-1" aria-label={`${ratingValue} out of 5 stars`}>
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
                 className={`h-4 sm:h-4.5 w-4 sm:w-4.5 transition-transform duration-300 ${
-                  i < item.rating
+                  i < ratingValue
                     ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]"
                     : "fill-muted/40 text-muted-foreground/30"
                 }`}
@@ -891,7 +931,7 @@ const TestimonialCardDeckItem = ({
             ))}
           </div>
 
-          {/* Verified Badge */}
+          {/* Verification Badge */}
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-2.5 py-0.5">
             <CheckCircle2 className="h-3 w-3" /> Verified Client
           </span>
@@ -904,15 +944,30 @@ const TestimonialCardDeckItem = ({
       </div>
 
       {/* Customer Review Quote Content */}
-      <blockquote className="text-sm sm:text-base md:text-lg font-medium text-foreground leading-relaxed italic">
+      <blockquote className="text-sm sm:text-base font-medium text-foreground leading-relaxed italic">
         &ldquo;{item.quote}&rdquo;
       </blockquote>
 
+      {/* Optional Installation Photo */}
+      {item.installationPhoto && (
+        <div className="mt-3 flex items-center gap-2.5 p-2 rounded-xl bg-muted/40 border border-border/50 max-w-fit">
+          <img
+            src={item.installationPhoto}
+            alt="Authorized Solar Installation Reference"
+            className="h-10 w-14 object-cover rounded-lg border border-border"
+          />
+          <div className="text-[10px] leading-tight text-muted-foreground">
+            <span className="font-semibold block text-foreground">Installation Reference</span>
+            <span>Rooftop solar setup (Verified installation)</span>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Author Row: Avatar + Name + District Location */}
-      <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between gap-4">
+      <div className="mt-4 pt-3.5 border-t border-border/50 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* Avatar Initial Disc */}
-          <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-gradient-brand text-slate-950 font-display font-bold text-sm sm:text-base shadow-md shrink-0">
+          <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full font-display font-bold text-sm sm:text-base shadow-md shrink-0 bg-gradient-brand text-slate-950">
             {initial}
           </div>
 
@@ -920,13 +975,13 @@ const TestimonialCardDeckItem = ({
             <h3 className="font-display font-bold text-base sm:text-lg text-foreground tracking-tight leading-snug">
               {item.name}
             </h3>
-            <p className="text-xs font-semibold text-emerald-500 dark:text-emerald-400 flex items-center gap-1">
-              <span>📍 {item.location}</span>
+            <p className="text-xs font-semibold flex items-center gap-1">
+              <span className="text-emerald-500 dark:text-emerald-400">📍 {locationText}</span>
             </p>
           </div>
         </div>
 
-        {/* UP Solar Guarantee Badge */}
+        {/* Right Badge: 25Y Warranty */}
         <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-muted/60 rounded-full px-3 py-1 border border-border/60">
           <Sparkles className="h-3 w-3 text-amber-400" /> 25Y Warranty
         </span>

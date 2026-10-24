@@ -72,7 +72,9 @@ export const getRewardNumeric = (val: any): number => {
       try {
         const num = val.toNumber();
         if (typeof num === "number" && !isNaN(num)) return num;
-      } catch {}
+      } catch {
+        // Fallback to numeric serialization
+      }
     }
     if (val.value !== undefined) return getRewardNumeric(val.value);
     if (Array.isArray(val.d) && val.d.length > 0) {

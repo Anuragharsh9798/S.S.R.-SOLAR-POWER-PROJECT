@@ -73,4 +73,33 @@ describe('Quotation API (e2e)', () => {
     expect(res.body.location.latitude).toBe(25.9417);
     expect(res.body.calculation.recommendedPlantSizeKw).toBeGreaterThanOrEqual(3);
   });
+
+  it('3. POST /api/v1/quotations - Should accept phone with +91 country code and normalize safely', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/quotations')
+      .send({
+        fullName: 'Pooja Verma',
+        phone: '+91 9876543210',
+        address: 'Sahadatpura',
+        city: 'Mau',
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.message).toBe('Quotation request received successfully');
+    expect(res.body.customerName).toBe('Pooja Verma');
+  });
+
+  it('4. POST /api/v1/quotations - Should reject invalid phone containing alphabets or invalid country code', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/quotations')
+      .send({
+        fullName: 'Invalid Phone Tester',
+        phone: '+1 9876543210',
+        address: 'Sahadatpura',
+        city: 'Mau',
+      });
+
+    expect(res.status).toBe(400);
+    expect(JSON.stringify(res.body.message)).toContain('valid 10-digit Indian phone number');
+  });
 });

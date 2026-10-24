@@ -38,7 +38,7 @@ export const BeforeAfter = ({ className = "" }: { className?: string } = {}) => 
         />
 
         {/* Real Photo Comparison Frame with Infinite Smooth Auto Transition */}
-        <div className="relative mt-8 md:mt-10 aspect-[16/9] sm:aspect-[21/9] min-h-[380px] md:min-h-[460px] w-full select-none overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl group">
+        <div className="relative mt-8 md:mt-10 aspect-[16/9] sm:aspect-[21/9] min-h-[260px] sm:min-h-[380px] md:min-h-[460px] w-full select-none overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl group">
           {/* 1. BEFORE IMAGE LAYER */}
           <motion.img
             src={BEFORE_IMAGE}
@@ -112,8 +112,8 @@ export const BeforeAfter = ({ className = "" }: { className?: string } = {}) => 
               >
                 {/* Top Badge */}
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-600/95 px-4 py-1.5 text-xs font-extrabold text-white shadow-glow backdrop-blur-md border border-emerald-400/40">
-                    <CheckCircle2 className="h-4 w-4" /> AFTER: 2 kW / 3 kW Solar Panel Installation
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-600/95 px-3.5 py-1.5 text-xs font-extrabold text-white shadow-glow backdrop-blur-md border border-emerald-400/40">
+                    <CheckCircle2 className="h-4 w-4" /> AFTER: 3 kW Solar Installation
                   </span>
                   <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-950/90 px-3 py-1 text-[11px] font-bold text-emerald-400 backdrop-blur-md border border-emerald-500/40">
                     <Sparkles className="h-3 w-3" /> PM Surya Ghar Scheme

@@ -21,7 +21,9 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     await this.seedDefaultRoles();
-    await this.seedDefaultAdmin();
+    if (process.env.NODE_ENV !== 'production') {
+      await this.seedDefaultAdmin();
+    }
   }
 
   async seedDefaultRoles() {
@@ -44,29 +46,51 @@ export class AuthService implements OnModuleInit {
   }
 
   async seedDefaultAdmin() {
+    // In production, automated default admin credential seeding is strictly disabled
+    if (process.env.NODE_ENV === 'production') {
+      this.logger.log('Production environment detected: automated credential seeding disabled.');
+      return;
+    }
+
+    // Explicitly require INITIAL_ADMIN_PASSWORD in development/test to seed initial accounts
+    const devPassword = process.env.INITIAL_ADMIN_PASSWORD;
+    if (!devPassword) {
+      this.logger.log(
+        'Automated initial admin seeding skipped: INITIAL_ADMIN_PASSWORD environment variable is not set.',
+      );
+      return;
+    }
+
     try {
+      // Only seed initial accounts if the database user table is completely empty
+      const existingUserCount = await this.prisma.user.count().catch(() => 0);
+      if (existingUserCount > 0) {
+        this.logger.log('Existing users detected in database; initial admin seeding skipped.');
+        return;
+      }
+
       await this.createUser({
-        email: 'superadmin@ssrsolar.com',
+        email: process.env.INITIAL_SUPERADMIN_EMAIL || 'superadmin@ssrsolar.com',
         phone: '+919876543209',
-        password: 'SuperAdminPassword123!',
+        password: devPassword,
         fullName: 'SSR Solar Super Admin',
         roleName: RoleEnum.SUPER_ADMIN,
       });
       await this.createUser({
-        email: 'admin@ssrsolar.com',
+        email: process.env.INITIAL_ADMIN_EMAIL || 'admin@ssrsolar.com',
         phone: '+919876543210',
-        password: 'AdminPassword123!',
+        password: devPassword,
         fullName: 'SSR Solar Admin',
         roleName: RoleEnum.ADMIN,
       });
       await this.createUser({
-        email: 'staff@ssrsolar.com',
+        email: process.env.INITIAL_STAFF_EMAIL || 'staff@ssrsolar.com',
         phone: '+919876543211',
-        password: 'StaffPassword123!',
+        password: devPassword,
         fullName: 'SSR Solar Staff',
         roleName: RoleEnum.STAFF,
       });
-      this.logger.log('Default Super Admin, Admin & Staff accounts verified.');
+      this.logger.log('Development initial test accounts verified.');
     } catch (err) {
       this.logger.warn(`Admin account seeding notice: ${err.message}`);
     }
@@ -167,6 +191,28 @@ export class AuthService implements OnModuleInit {
   }
 
   async createUser(data: { email: string; phone: string; password: string; fullName: string; roleName: RoleEnum }) {
+    // 1. If user already exists in database, NEVER overwrite passwordHash or existing credentials
+    try {
+      const existingDbUser = await this.prisma.user.findUnique({
+        where: { email: data.email },
+        include: { role: true },
+      });
+
+      if (existingDbUser) {
+        this.logger.log(`Account ${data.email} already exists; preserving existing credentials.`);
+        this.inMemoryUsers.set(data.email, existingDbUser);
+        return existingDbUser;
+      }
+    } catch {
+      // Fallback for offline DB execution
+    }
+
+    // 2. If user already exists in in-memory session store, preserve existing credentials
+    if (this.inMemoryUsers.has(data.email)) {
+      this.logger.log(`In-memory user ${data.email} already exists; preserving existing credentials.`);
+      return this.inMemoryUsers.get(data.email);
+    }
+
     const passwordHash = await this.argon2Service.hashPassword(data.password);
     const id = `user-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
 
@@ -186,16 +232,8 @@ export class AuthService implements OnModuleInit {
     try {
       const role = await this.prisma.role.findUnique({ where: { name: data.roleName } });
       if (role) {
-        const dbUser = await this.prisma.user.upsert({
-          where: { email: data.email },
-          update: {
-            fullName: data.fullName,
-            phone: data.phone,
-            passwordHash,
-            roleId: role.id,
-            isActive: true,
-          },
-          create: {
+        const dbUser = await this.prisma.user.create({
+          data: {
             email: data.email,
             phone: data.phone,
             fullName: data.fullName,
@@ -209,9 +247,18 @@ export class AuthService implements OnModuleInit {
         return dbUser;
       }
     } catch (err) {
-      this.logger.warn(`DB User upsert notice for ${data.email}: ${err.message}`);
+      this.logger.warn(`DB User creation notice for ${data.email}: ${err.message}`);
     }
 
     return memUser;
+  }
+
+  findUserById(id: string): any {
+    for (const user of this.inMemoryUsers.values()) {
+      if (user.id === id) {
+        return user;
+      }
+    }
+    return null;
   }
 }

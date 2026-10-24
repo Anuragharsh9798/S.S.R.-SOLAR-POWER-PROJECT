@@ -292,7 +292,7 @@ export const Navbar = () => {
           <Button
             type="button"
             onClick={openFreeQuoteModal}
-            className="btn-premium btn-gold-shine inline-flex rounded-full px-2.5 sm:px-3.5 lg:px-3.5 xl:px-5 py-1.5 sm:py-2 text-xs lg:text-[12.5px] xl:text-sm font-semibold whitespace-nowrap hover:scale-[1.03] shrink-0"
+            className="btn-premium btn-gold-shine hidden sm:inline-flex rounded-full px-2.5 sm:px-3.5 lg:px-3.5 xl:px-5 py-1.5 sm:py-2 text-xs lg:text-[12.5px] xl:text-sm font-semibold whitespace-nowrap hover:scale-[1.03] shrink-0"
           >
             Get Free Quote
           </Button>

@@ -5,6 +5,7 @@ import { ArrowRight, Calculator, PlayCircle, Sun, Moon, Sparkles, BatteryChargin
 import { Button } from "@/components/ui/button";
 import { heroCards } from "@/data/site";
 import { useTheme } from "@/components/ThemeProvider";
+import { openFreeQuoteModal } from "@/components/FreeQuoteModal";
 import heroSolarRooftopWorker from "@/assets/hero-solar-rooftop-worker.png";
 
 const headingWords = ["Power", "Your", "Future", "with"];
@@ -304,11 +305,14 @@ export const Hero = () => {
                   animate={{ scale: [1, 1.04, 1, 1.04, 1] }}
                   transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 4.8, ease: "easeInOut" }}
                 >
-                  <Button asChild size="lg" className="btn-premium group h-12 rounded-full bg-gradient-brand px-7 text-base font-semibold text-primary-foreground shadow-glow">
-                    <Link to="/calculator">
-                      Get Free Quote
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1.5" />
-                    </Link>
+                  <Button
+                    type="button"
+                    onClick={openFreeQuoteModal}
+                    size="lg"
+                    className="btn-premium group h-12 rounded-full bg-gradient-brand px-7 text-base font-semibold text-primary-foreground shadow-glow"
+                  >
+                    Get Free Quote
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1.5" />
                   </Button>
                 </motion.div>
               )}

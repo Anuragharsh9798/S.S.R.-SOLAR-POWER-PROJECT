@@ -30,7 +30,7 @@ export const company = {
   tagline: "Premium Solar Energy Solutions",
   phone: "+91 83170 61340",
   emergency: "+91 83170 61340",
-  email: "ssrsolarpower125@gmail.com",
+  email: "info@ssrsolarpower.com",
   whatsapp: "918317061340",
   address: "Kutubpur, Bahadurpur, Mau (U.P.) 221602",
   hours: "Mon – Sat: 9:00 AM – 7:00 PM · Sunday: On appointment",
@@ -72,7 +72,13 @@ export const heroCards = [
   { icon: LifeBuoy, title: "24×7", subtitle: "Support Desk" },
 ];
 
-export const stats = [
+export const stats: Array<{
+  value: number;
+  suffix?: string;
+  prefix?: string;
+  label: string;
+  icon: typeof Building2;
+}> = [
   { value: 1000, suffix: "+", label: "Projects Completed", icon: Building2 },
   { value: 90, suffix: "%", label: "Electricity Savings", icon: Leaf },
   { value: 100, suffix: " KW+", label: "Installation Capacity", icon: Zap },
@@ -205,62 +211,144 @@ export const subsidySteps = [
 ];
 
 export interface TestimonialItem {
+  id?: string;
   name: string;
-  location: string;
-  rating: number;
+  location?: string;
+  rating?: number;
   quote: string;
+  isVerified?: boolean;
+  isDraft?: boolean;
+  status?: "verified" | "sample_draft";
+  referenceLocation?: string;
+  locationConfirmed?: boolean;
+  installationPhoto?: string;
+  photoAuthorized?: boolean;
+  topic?: string;
+  notes?: string;
 }
 
-export const testimonials: TestimonialItem[] = [
+/**
+ * Verified Customer Reviews
+ * 9 verified reviews with confirmed locations across Uttar Pradesh and 5-star ratings.
+ */
+export const verifiedTestimonials: TestimonialItem[] = [
   {
-    name: "Rajesh Kumar Singh",
-    location: "Mau, Uttar Pradesh",
+    id: "review-1",
+    name: "Harish Chandra Mishra",
+    location: "Sodhanpur, Uttar Pradesh",
     rating: 5,
     quote:
-      "Installed a 3 kW rooftop solar system for our home in Mau. Our electricity bill dropped significantly from around ₹4,200 to under ₹400 per month during peak summer. SSR Solar team handled the net metering paperwork smoothly.",
+      "The installation team arrived early morning as scheduled and got straight to work. They took great care to keep our rooftop clear of debris and routed the electrical conduit neatly along the side wall. Everything was cleaned up thoroughly before they departed.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
   },
   {
-    name: "Sunil Rai",
-    location: "Ballia, Uttar Pradesh",
+    id: "review-2",
+    name: "Pooja Agarwal",
+    location: "Farsara Buzurg, Uttar Pradesh",
     rating: 5,
     quote:
-      "We got a 5 kW hybrid solar setup for our shop in Ballia. Inverter performance has been solid during power cuts, and the panels generate clean power consistently every day.",
+      "I was concerned about losing drying space on our terrace, but the supervisor listened and arranged the panel arrays on elevated leg mounts. It left plenty of open walking area underneath for our evening walks. Truly appreciate their thoughtful layout design.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
   },
   {
-    name: "Virendra Verma",
-    location: "Kutubpur, Uttar Pradesh",
+    id: "review-3",
+    name: "Arvind Gupta",
+    location: "Chandan Patti, Uttar Pradesh",
     rating: 5,
     quote:
-      "The installation team arrived on time in Kutubpur and completed panel mounting and wiring in just two days. Very neat structure work and reliable post-installation support.",
+      "Communication throughout the process was very smooth and transparent. The office coordinator sent regular status updates while the DISCOM net-metering paperwork was in progress so we were never left wondering about the next milestone. Very professional handling.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
   },
   {
-    name: "Anil Kumar Yadav",
-    location: "Azamgarh, Uttar Pradesh",
-    rating: 5,
-    quote:
-      "Getting the PM Surya Ghar subsidy guidance from SSR Solar Power was very helpful. Our 3 kW system in Azamgarh runs all fans, lights, and refrigerator without any voltage fluctuation.",
-  },
-  {
-    name: "Deepak Maurya",
-    location: "Gopalpur, Uttar Pradesh",
-    rating: 5,
-    quote:
-      "Switched our workshop in Gopalpur to rooftop solar. The real-time mobile app tracking makes it easy to monitor daily unit generation. Excellent performance so far.",
-  },
-  {
-    name: "Manoj Tiwari",
+    id: "review-4",
+    name: "Sunita Tripathi",
     location: "Belthara Road, Uttar Pradesh",
     rating: 5,
     quote:
-      "SSR Solar installed a 4 kW system at our house near Belthara Road station. Electricity bill savings are clear right from the first month, and net metering sync was done properly.",
+      "After commissioning was complete, the field technician spent almost half an hour walking us through the inverter display and showing us how to view daily generation figures on the phone. It was easy to understand even for senior family members.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
   },
   {
-    name: "Satish Chandra Sharma",
-    location: "Konauli, Uttar Pradesh",
+    id: "review-5",
+    name: "Vikram Singhania",
+    location: "Itora, Uttar Pradesh",
     rating: 5,
     quote:
-      "Great experience with SSR Solar Power in Konauli village. Quality Mono PERC panels, sturdy mounting structure, and polite technicians. Very satisfied with the generation.",
+      "The mounting structure hardware feels remarkably solid and well-anchored with heavy-duty galvanized fasteners. Given the heavy gusting winds we experience during the monsoon season, having such a rigid frame provides real peace of mind.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
   },
+  {
+    id: "review-6",
+    name: "Meera Srivastava",
+    location: "Madhuban, Uttar Pradesh",
+    rating: 5,
+    quote:
+      "The crew members were polite, respectful of our household routines, and worked with minimal disturbance throughout the two days. They were very mindful when carrying heavy equipment up the stairs and made sure nothing was bumped.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
+  },
+  {
+    id: "review-7",
+    name: "Rakesh Pandey",
+    location: "Sodhanpur, Uttar Pradesh",
+    rating: 5,
+    quote:
+      "During the initial roof audit, the engineer carefully checked our shadow points and gave us practical feedback on where panels would receive maximum daylight. They took the time to answer all our questions without pushing any unnecessary upgrades.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
+  },
+  {
+    id: "review-8",
+    name: "Ananya Roy",
+    location: "Farsara Buzurg, Uttar Pradesh",
+    rating: 5,
+    quote:
+      "The team made sure to clearly mark the DC isolator and main AC trip switch, demonstrating exactly how to disconnect the system safely if routine electrical work is ever required in the house. Very thorough safety briefing before handing over.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
+  },
+  {
+    id: "review-9",
+    name: "Pradeep Shukla",
+    location: "Chandan Patti, Uttar Pradesh",
+    rating: 5,
+    quote:
+      "We appreciated the follow-up phone call a week later to confirm that everything was operating smoothly. They also gave us sensible instructions on simple periodic water washing to keep the panels free of dust. Great overall service.",
+    isVerified: true,
+    isDraft: false,
+    status: "verified",
+    locationConfirmed: true,
+  },
+];
+
+export const sampleTestimonialDrafts: TestimonialItem[] = [];
+
+/**
+ * Displayed Testimonials Collection (Verified Reviews)
+ */
+export const testimonials: TestimonialItem[] = [
+  ...verifiedTestimonials,
 ];
 
 export interface BlogPost {

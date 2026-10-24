@@ -24,10 +24,10 @@ export class AuthController {
   @UseGuards(ThrottlerGuard)
   @Throttle({
     default: {
-      limit: 100,
+      limit: process.env.NODE_ENV === 'production' ? 5 : 100,
       ttl: 60000,
     },
-  }) // 5 login attempts per minute in production, relaxed in test environment
+  })
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     return this.authService.login(loginDto, res);
   }

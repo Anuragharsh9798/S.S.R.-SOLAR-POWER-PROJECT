@@ -298,26 +298,6 @@ export const Subsidy = () => {
                 </div>
               ))}
             </div>
-          ) : statsError && (!govtStats || govtStats.length === 0) ? (
-            /* API Failure Unavailable / Error State */
-            <div className="mx-auto max-w-xl rounded-3xl border border-destructive/30 bg-destructive/10 p-8 text-center space-y-4 shadow-soft">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/20 text-destructive">
-                <AlertCircle className="h-6 w-6" />
-              </div>
-              <h4 className="text-lg font-bold text-foreground">Government Statistics Unavailable</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto">
-                Unable to load verified government statistics from the backend server ({statsError}).
-              </p>
-              <div className="pt-2">
-                <Button
-                  onClick={fetchGovtStats}
-                  variant="outline"
-                  className="rounded-full px-5 text-xs font-semibold flex items-center gap-2 mx-auto"
-                >
-                  <RefreshCw className="h-3.5 w-3.5" /> Retry Connection
-                </Button>
-              </div>
-            </div>
           ) : (
             /* Verified Government Statistics Grid */
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

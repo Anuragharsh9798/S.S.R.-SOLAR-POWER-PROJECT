@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>New Solar Quote Enquiry – {{client_name}}</title>
+  <style>
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100% !important;
+      min-width: 100%;
+      height: 100% !important;
+      background-color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .responsive-column {
+        width: 100% !important;
+        display: block !important;
+      }
+      .mobile-padding {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      .cta-btn-block {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-bottom: 8px !important;
+      }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a;">
+  <!-- Outer Wrapper Table -->
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; padding: 24px 8px;">
+    <tr>
+      <td align="center">
+        <!-- Main Container Card -->
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-container" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+          
+          <!-- Header Banner -->
+          <tr>
+            <td align="center" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); background-color: #0f172a; padding: 28px 20px; border-bottom: 4px solid #10b981;">
+              <h1 style="color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 6px 0; text-align: center;">
+                ☀️ SSR Solar Power
+              </h1>
+              <div style="color: #94a3b8; font-size: 13px; font-weight: 500; text-align: center; margin: 0 0 12px 0;">
+                New Client Rooftop Solar Quotation Enquiry
+              </div>
+              <div style="display: inline-block; background-color: #10b981; color: #ffffff; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 9999px; letter-spacing: 0.5px; font-family: monospace;">
+                Quote Ref: {{quote_number}}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 24px 20px;" class="mobile-padding">
+
+              <!-- Submission Alert Notification -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 18px; background-color: #ecfdf5; border-left: 4px solid #10b981; border-radius: 8px;">
+                <tr>
+                  <td style="padding: 12px 14px; font-size: 13px; color: #065f46; font-weight: 600; line-height: 1.5;">
+                    🔔 <strong>New enquiry received on:</strong> {{submission_date}}<br>
+                    Please review requirements and contact the client promptly.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Prominent Quick Action / Call Client Card -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 22px; background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); background-color: #fef9c3; border: 1px solid #facc15; border-radius: 12px; text-align: center;">
+                <tr>
+                  <td align="center" style="padding: 18px 16px;">
+                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #854d0e; letter-spacing: 0.5px; margin-bottom: 4px;">
+                      Client Contact Number
+                    </div>
+                    <a href="tel:{{client_phone}}" style="font-size: 22px; font-weight: 900; color: #713f12; text-decoration: none; display: inline-block; margin-bottom: 12px; font-family: monospace;">
+                      📞 {{client_phone}}
+                    </a>
+                    <div>
+                      <a href="tel:{{client_phone}}" class="cta-btn-block" style="display: inline-block; background-color: #10b981; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 8px; margin: 4px;">
+                        📞 Call Client Now
+                      </a>
+                      <a href="https://wa.me/91{{client_phone}}" target="_blank" class="cta-btn-block" style="display: inline-block; background-color: #25d366; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 8px; margin: 4px;">
+                        💬 WhatsApp Message
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Section: Client Details -->
+              <div style="font-size: 14px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 8px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+                👤 Client Information
+              </div>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13px; margin-bottom: 16px;">
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Full Name
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{client_name}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Mobile / Phone
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    <a href="tel:{{client_phone}}" style="color: #0284c7; text-decoration: none;">{{client_phone}}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Email Address
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    <a href="mailto:{{client_email}}" style="color: #0284c7; text-decoration: none;">{{client_email}}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Submission Date & Time
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{submission_date}}
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Section: Solar System Requirements -->
+              <div style="font-size: 14px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin: 20px 0 8px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+                ⚡ Solar System Requirements
+              </div>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13px; margin-bottom: 16px;">
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Solar System Type
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #059669; font-weight: 800; width: 62%; vertical-align: top;">
+                    {{solar_type}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Monthly Electricity Bill
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{monthly_bill}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Quote Reference Code
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; font-family: monospace; width: 62%; vertical-align: top;">
+                    {{quote_number}}
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Section: Installation Address -->
+              <div style="font-size: 14px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin: 20px 0 8px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+                📍 Installation Address & Location
+              </div>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13px; margin-bottom: 16px;">
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Complete Address
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{complete_address}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    House / Flat No.
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{house_number}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Area / Locality
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{area_locality}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    City / Town
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{city}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    District
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{district}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    State
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{state}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    PIN Code
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    {{pincode}}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600; width: 38%; vertical-align: top;">
+                    Google Maps Link
+                  </td>
+                  <td style="padding: 9px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 700; width: 62%; vertical-align: top;">
+                    <a href="{{google_maps_url}}" target="_blank" style="color: #0284c7; text-decoration: underline; word-break: break-all;">{{google_maps_url}}</a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Section: Client Notes -->
+              <div style="font-size: 14px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin: 20px 0 8px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+                💬 Additional Client Notes
+              </div>
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; font-size: 13px; color: #334155; line-height: 1.6; word-break: break-word;">
+                {{client_message}}
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b; line-height: 1.6;">
+              <strong style="color: #1e293b; font-size: 12px;">SSR Solar Power</strong><br>
+              Kutubpur, Bahadurpur, Mau, Uttar Pradesh - 221602<br>
+              Direct Call / Helpline: <a href="tel:+918009943210" style="color: #0284c7; text-decoration: none;">+91 80099 43210</a> · Official Email: <a href="mailto:info@ssrsolarpower.com" style="color: #0284c7; text-decoration: none;">info@ssrsolarpower.com</a><br>
+              Website: <a href="https://ssrsolarpower.com" target="_blank" style="color: #0284c7; text-decoration: none;">ssrsolarpower.com</a><br>
+              <span style="font-size: 10px; color: #94a3b8; display: block; margin-top: 8px;">
+                This automated notification was generated from the Get Free Quote form on ssrsolarpower.com.
+              </span>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -10,6 +10,7 @@ import {
   Req,
   HttpStatus,
   HttpCode,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -62,8 +63,10 @@ export class AdminDatabaseController {
     @Body() body: Record<string, any>,
     @Req() req: any,
   ) {
-    const adminUser = req.user || { email: 'admin@ssrsolar.com', role: 'ADMIN' };
-    return this.databaseService.updateRecord(table, id, body, adminUser);
+    if (!req.user) {
+      throw new UnauthorizedException('Authentication identity missing');
+    }
+    return this.databaseService.updateRecord(table, id, body, req.user);
   }
 
   @Delete(':table/:id')
@@ -74,7 +77,9 @@ export class AdminDatabaseController {
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    const adminUser = req.user || { email: 'superadmin@ssrsolar.com', role: 'SUPER_ADMIN' };
-    return this.databaseService.deleteRecord(table, id, adminUser);
+    if (!req.user) {
+      throw new UnauthorizedException('Authentication identity missing');
+    }
+    return this.databaseService.deleteRecord(table, id, req.user);
   }
 }

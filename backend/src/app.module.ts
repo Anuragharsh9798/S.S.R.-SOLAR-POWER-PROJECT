@@ -27,6 +27,9 @@ import { GlobalHttpExceptionFilter } from './common/filters/http-exception.filte
 import { SanitizeResponseInterceptor } from './common/interceptors/sanitize-response.interceptor';
 import { SecurityTestController } from './security-test/security-test.controller';
 
+const devControllers =
+  process.env.NODE_ENV !== 'production' ? [SecurityTestController] : [];
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -55,10 +58,10 @@ import { SecurityTestController } from './security-test/security-test.controller
   ],
   controllers: [
     AppController,
-    SecurityTestController,
     AdminController,
     AdminDatabaseController,
     AdminSettingsController,
+    ...devControllers,
   ],
   providers: [
     AppService,

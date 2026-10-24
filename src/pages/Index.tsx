@@ -7,10 +7,8 @@ import { WhyChoose } from "@/components/sections/WhyChoose";
 import { ServicesSection } from "@/components/sections/Services";
 import { EnergyFlowSection } from "@/components/sections/EnergyFlow";
 import { InstallationProcess, SubsidyTimeline } from "@/components/sections/Timelines";
-import { ProjectsGrid } from "@/components/sections/Projects";
 import { BeforeAfter } from "@/components/sections/BeforeAfter";
 import { RealTimeMonitoring } from "@/components/sections/RealTimeMonitoring";
-import { Testimonials } from "@/components/sections/Testimonials";
 import { VideoSection } from "@/components/sections/VideoSection";
 import { BlogSection } from "@/components/sections/Blog";
 import { FaqSection } from "@/components/sections/Faq";
@@ -33,9 +31,7 @@ const Index = () => (
     <RealTimeMonitoring />
     <SubsidyTimeline />
     <InstallationProcess />
-    <ProjectsGrid />
     <BeforeAfter />
-    <Testimonials isHomePage={true} />
     <VideoSection />
     <BlogSection />
     <FaqSection />

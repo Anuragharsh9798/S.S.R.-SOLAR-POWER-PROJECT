@@ -9,7 +9,7 @@ export class AdminSettingsService {
   // Safe Application & Business Settings State
   private businessSettings = {
     companyName: 'SSR Solar Power',
-    contactEmail: 'contact@ssrsolar.com',
+    contactEmail: 'info@ssrsolarpower.com',
     hotlinePhone: '+91 98765 43210',
     officeAddress: 'Kutubpur, Bahadurpur, Mau, Uttar Pradesh - 221602',
     operatingHours: 'Mon - Sat: 9:00 AM - 7:00 PM',

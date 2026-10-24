@@ -826,3 +826,79 @@
   background-color: #f7d978 !important;
 }
 
+/* ==========================================================================
+   SSR Solar Power — Professional Solar Proposal Print / PDF Stylesheet
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Universal print suppression for all website navigation and floating UI */
+  nav,
+  header,
+  footer,
+  aside,
+  .print\:hidden,
+  .print-hidden,
+  [data-print-hidden="true"],
+  .floating-actions,
+  .custom-cursor,
+  .ambient-background,
+  .scroll-progress,
+  .cookie-consent,
+  .free-quote-modal,
+  .dialog-overlay,
+  [role="dialog"],
+  .sonner-toast,
+  #ambient-background,
+  .blob,
+  .blob-glow {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Proposal document print container */
+  .solar-proposal-print-document {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Prevent page cuts inside cards & tables */
+  .proposal-section,
+  .proposal-card,
+  .proposal-table-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+

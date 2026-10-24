@@ -9,6 +9,7 @@ import * as request from 'supertest';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from '../src/app.module';
 import { AuthService } from '../src/auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 import { RoleEnum } from '../src/auth/enums/role.enum';
 
 jest.setTimeout(30000);
@@ -16,6 +17,7 @@ jest.setTimeout(30000);
 describe('Admin Authentication & RBAC (e2e)', () => {
   let app: INestApplication;
   let authService: AuthService;
+  let jwtService: JwtService;
 
   let adminCookie: string[];
   let adminToken: string;
@@ -25,7 +27,7 @@ describe('Admin Authentication & RBAC (e2e)', () => {
 
   const adminUser = {
     email: 'admin.test@ssrsolar.com',
-    phone: '+919876543210',
+    phone: '+919876543230',
     password: 'AdminPassword123!',
     fullName: 'SSR System Admin',
     roleName: RoleEnum.ADMIN,
@@ -33,7 +35,7 @@ describe('Admin Authentication & RBAC (e2e)', () => {
 
   const staffUser = {
     email: 'staff.test@ssrsolar.com',
-    phone: '+919876543211',
+    phone: '+919876543231',
     password: 'StaffPassword123!',
     fullName: 'SSR Staff Member',
     roleName: RoleEnum.STAFF,
@@ -56,6 +58,7 @@ describe('Admin Authentication & RBAC (e2e)', () => {
     await app.init();
 
     authService = moduleFixture.get<AuthService>(AuthService);
+    jwtService = moduleFixture.get<JwtService>(JwtService);
     await authService.seedDefaultRoles();
 
     try {
@@ -162,5 +165,41 @@ describe('Admin Authentication & RBAC (e2e)', () => {
     // Verify GET /api/v1/auth/me is unauthenticated without token
     const meRes = await request(app.getHttpServer()).get('/api/v1/auth/me');
     expect(meRes.status).toBe(401);
+  });
+
+  it('7. GET /api/v1/auth/me - Should reject invalid or malformed tokens with 401', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Authorization', 'Bearer totally.invalid.signature');
+
+    expect(res.status).toBe(401);
+  });
+
+  it('8. GET /api/v1/auth/me - Should reject expired tokens with 401', async () => {
+    const expiredToken = jwtService.sign(
+      { sub: adminUser.email, email: adminUser.email, role: RoleEnum.ADMIN },
+      { expiresIn: '-10s' },
+    );
+
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${expiredToken}`);
+
+    expect(res.status).toBe(401);
+  });
+
+  it('9. GET /api/v1/auth/me - Should reject token referencing nonexistent database user with 401 (never synthesize Super Admin)', async () => {
+    const nonexistentUserToken = jwtService.sign({
+      sub: '00000000-0000-0000-0000-000000000000',
+      email: 'ghost.user@notfound.com',
+      role: RoleEnum.SUPER_ADMIN,
+    });
+
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${nonexistentUserToken}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toContain('User session invalid or user account does not exist');
   });
 });

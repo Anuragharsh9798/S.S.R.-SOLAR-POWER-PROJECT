@@ -12,17 +12,21 @@ import { CustomCursor } from "./CustomCursor";
 
 export const Layout = ({ children }: { children: ReactNode }) => (
   <div className="flex min-h-screen flex-col">
-    <PageLoader />
-    <CustomCursor />
-    <AmbientBackground />
-    <ScrollProgress />
-    <Navbar />
+    <div className="print:hidden">
+      <PageLoader />
+      <CustomCursor />
+      <AmbientBackground />
+      <ScrollProgress />
+      <Navbar />
+    </div>
     <main className="flex-1">
       {children}
     </main>
-    <Footer />
-    <FloatingActions />
-    <FreeQuoteModal />
-    <CookieConsent />
+    <div className="print:hidden">
+      <Footer />
+      <FloatingActions />
+      <FreeQuoteModal />
+      <CookieConsent />
+    </div>
   </div>
 );

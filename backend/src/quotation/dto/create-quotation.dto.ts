@@ -8,16 +8,26 @@ import {
   Min,
   Max,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateQuotationDto {
   @IsNotEmpty({ message: 'Full name is required' })
   @IsString()
   fullName: string;
 
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    const cleaned = value.trim().replace(/[\s\-\(\)\.]+/g, '');
+    const match = cleaned.match(/^(?:\+91|91|0)?([6-9]\d{9})$/);
+    if (match) {
+      return match[1];
+    }
+    return cleaned;
+  })
   @IsNotEmpty({ message: 'Mobile phone number is required' })
   @IsString()
   @Matches(/^[6-9]\d{9}$/, {
-    message: 'Mobile number must be a valid 10-digit Indian phone number',
+    message: 'Mobile number must be a valid 10-digit Indian phone number (e.g. +91 9876543210 or 9876543210)',
   })
   phone: string;
 

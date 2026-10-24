@@ -52,13 +52,29 @@ export class ReviewsService {
 
   async findAllPublic() {
     try {
-      return await this.prisma.review.findMany({
+      const records = await this.prisma.review.findMany({
         where: { isApproved: true },
         orderBy: { createdAt: 'desc' },
       });
+
+      // Deduplicate by name and quote
+      const seen = new Set<string>();
+      return records.filter((r) => {
+        const key = `${(r.name || '').trim().toLowerCase()}:::${(r.quote || '').trim().toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
     } catch (err) {
       this.logger.warn(`Reviews DB lookup notice: ${err.message}`);
-      return Array.from(this.inMemoryReviews.values()).filter((r) => r.isApproved);
+      const inMemory = Array.from(this.inMemoryReviews.values()).filter((r) => r.isApproved);
+      const seen = new Set<string>();
+      return inMemory.filter((r) => {
+        const key = `${(r.name || '').trim().toLowerCase()}:::${(r.quote || '').trim().toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
     }
   }
 

@@ -25,7 +25,7 @@ const sections = [
   },
   {
     title: "Your rights",
-    body: "You may request access to, correction of, or deletion of your personal data at any time by writing to ssrsolarpower125@gmail.com.",
+    body: "You may request access to, correction of, or deletion of your personal data at any time by writing to info@ssrsolarpower.com.",
   },
 ];
 

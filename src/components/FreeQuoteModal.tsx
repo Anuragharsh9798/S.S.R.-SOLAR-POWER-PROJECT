@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { fetchReverseGeocode } from "@/lib/reverseGeocode";
 import { api } from "@/lib/api";
+import { sendQuoteEnquiryEmail } from "@/lib/emailService";
+
 
 export const openFreeQuoteModal = () => {
   if (typeof window !== "undefined") {
@@ -24,6 +26,18 @@ interface GpsLocationData {
   accuracy: number;
   timestamp: string;
   googleMapsUrl: string;
+}
+
+interface QuotationResponse {
+  quoteNumber?: string;
+  calculation?: {
+    recommendedPlantSizeKw?: number;
+    panelSpecs?: {
+      requiredPanels?: number;
+      requiredRoofAreaSqFt?: number;
+    };
+  };
+  [key: string]: unknown;
 }
 
 export const FreeQuoteModal = () => {
@@ -68,12 +82,17 @@ export const FreeQuoteModal = () => {
     monthlyBill: "",
     unitsConsumption: "",
     electricityRate: "",
-    solarType: "On-Grid",
+    solarType: "On-Grid Solar",
     message: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "sent" | "failed" | "skipped">("idle");
+
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [quoteResponse, setQuoteResponse] = useState<QuotationResponse | null>(null);
+
 
   const handleDetectLocation = () => {
     if (locationStatus === "detecting" || locationStatus === "fetching_address") return;
@@ -181,18 +200,26 @@ export const FreeQuoteModal = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.fullName.trim() || !formData.mobile.trim() || !formData.address.trim()) {
-      toast.error("Please fill in all required fields marked with * (Full Name, Mobile, Address)");
+    if (!formData.fullName.trim() || !formData.mobile.trim() || !formData.address.trim() || !formData.solarType.trim()) {
+      toast.error("Please fill in all required fields marked with * (Full Name, Mobile, Address, Solar System Type)");
       return;
     }
 
     if (isSubmitting) return;
     setIsSubmitting(true);
     setApiError(null);
+    let cleanPhone = formData.mobile.trim().replace(/[\s\-\(\)\.]+/g, "");
+    const phoneMatch = cleanPhone.match(/^(?:\+91|91|0)?([6-9]\d{9})$/);
+    if (!phoneMatch) {
+      toast.error("Please enter a valid 10-digit Indian mobile number");
+      setIsSubmitting(false);
+      return;
+    }
+    cleanPhone = phoneMatch[1];
 
     const payload = {
       fullName: formData.fullName.trim(),
-      phone: formData.mobile.trim(),
+      phone: cleanPhone,
       email: formData.email?.trim() || undefined,
       address: formData.address.trim(),
       houseNumber: formData.houseNumber?.trim() || undefined,
@@ -207,20 +234,68 @@ export const FreeQuoteModal = () => {
       googleMapsUrl: gpsLocation?.googleMapsUrl,
       monthlyBillAmount: parseFloat(formData.monthlyBill) || undefined,
       electricityRate: parseFloat(formData.electricityRate) || 8.0,
-      solarType: formData.solarType || "On-Grid",
+      solarType: formData.solarType.trim() || "On-Grid Solar",
       contactTime: "Any Time",
       message: formData.message?.trim() || undefined,
     };
 
     try {
-      const res = await api.post<any>("/api/v1/quotations", payload);
+      // 1. Submit quotation to backend database exactly once
+      const res = await api.post<QuotationResponse>("/api/v1/quotations", payload);
       setQuoteResponse(res);
       setSubmitted(true);
-      toast.success("Quote request received successfully!", {
-        description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+
+      // 2. Dispatch EmailJS notification using quote reference
+      const submissionDate = new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Asia/Kolkata",
       });
+
+      const emailResult = await sendQuoteEnquiryEmail({
+        client_name: formData.fullName.trim(),
+        client_phone: cleanPhone,
+        client_email: formData.email?.trim() || undefined,
+        complete_address: formData.address.trim(),
+        house_number: formData.houseNumber?.trim() || undefined,
+        area_locality: formData.area?.trim() || undefined,
+        city: formData.city?.trim() || "Mau",
+        district: formData.district?.trim() || undefined,
+        state: formData.state?.trim() || "Uttar Pradesh",
+        pincode: formData.pin?.trim() || undefined,
+        monthly_bill: formData.monthlyBill ? `₹${formData.monthlyBill}` : undefined,
+        solar_type: formData.solarType.trim() || "On-Grid Solar",
+        client_message: formData.message?.trim() || undefined,
+        quote_number: res?.quoteNumber || undefined,
+        submission_date: submissionDate,
+        google_maps_url: gpsLocation?.googleMapsUrl,
+      });
+
+      // 3. Handle EmailJS outcome without resubmitting quotation to backend
+      if (emailResult.success) {
+        setEmailStatus("sent");
+        toast.success("Quote request received successfully!", {
+          description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+        });
+      } else if (emailResult.skipped) {
+        setEmailStatus("skipped");
+        toast.success("Quote request received successfully!", {
+          description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+        });
+        if (import.meta.env.DEV) {
+          toast.error("EmailJS not configured. Please set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY in .env");
+        }
+      } else {
+        setEmailStatus("failed");
+        toast.success("Quote request received successfully!", {
+          description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+        });
+        toast.error("Quote was saved, but the email notification to our team could not be sent.");
+      }
+
       setTimeout(() => {
         setSubmitted(false);
+        setEmailStatus("idle");
         setFormData({
           fullName: "",
           mobile: "",
@@ -235,13 +310,13 @@ export const FreeQuoteModal = () => {
           monthlyBill: "",
           unitsConsumption: "",
           electricityRate: "",
-          solarType: "On-Grid",
+          solarType: "On-Grid Solar",
           message: "",
         });
         setLocationStatus("idle");
         setGpsLocation(null);
         onClose();
-      }, 2000);
+      }, 2500);
     } catch (err: any) {
       console.error("Quotation API error:", err);
       const errMsg = err.message || "Failed to submit quote request. Please try again.";
@@ -314,6 +389,16 @@ export const FreeQuoteModal = () => {
                 {quoteResponse?.quoteNumber && (
                   <div className="inline-block rounded-lg border border-amber-500/40 bg-amber-500/10 px-3.5 py-1.5 text-xs font-mono font-bold text-amber-400">
                     Quote Reference: {quoteResponse.quoteNumber}
+                  </div>
+                )}
+                {emailStatus === "sent" && (
+                  <div className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400 font-medium">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Notification email delivered to SSR Solar team
+                  </div>
+                )}
+                {emailStatus === "failed" && (
+                  <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-300">
+                    Quote saved, but email notification could not be sent. We will call you directly.
                   </div>
                 )}
                 {quoteResponse?.calculation && (
@@ -621,6 +706,28 @@ export const FreeQuoteModal = () => {
                         className="h-8 text-xs rounded-lg bg-slate-950/80 border-slate-700 text-white placeholder:text-slate-500 px-2"
                       />
                     </div>
+                  </div>
+
+                  {/* Solar System Type */}
+                  <div className="space-y-0.5">
+                    <Label htmlFor="modalSolarType" className="text-[11px] font-bold text-slate-200">
+                      Solar System Type *
+                    </Label>
+                    <select
+                      id="modalSolarType"
+                      name="solarType"
+                      required
+                      value={formData.solarType}
+                      onChange={(e) => setFormData({ ...formData, solarType: e.target.value })}
+                      className="w-full h-8.5 text-xs rounded-lg bg-slate-950/80 border border-slate-700 text-white px-2.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                    >
+                      <option value="On-Grid Solar" className="bg-slate-900 text-white">
+                        On-Grid Solar
+                      </option>
+                      <option value="Hybrid Solar" className="bg-slate-900 text-white">
+                        Hybrid Solar
+                      </option>
+                    </select>
                   </div>
 
                   {/* Message / Requirement */}

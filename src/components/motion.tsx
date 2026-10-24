@@ -40,12 +40,14 @@ export const MotionSection = ({
   className = "",
   variant,
   animation = "fadeUp",
+  delay = 0,
   ...rest
 }: {
   children: ReactNode;
   className?: string;
   variant?: Variants;
   animation?: AnimationType;
+  delay?: number;
 } & HTMLMotionProps<"section">) => {
   const chosenVariant = variant || variantMap[animation] || fadeUp;
 
@@ -55,7 +57,7 @@ export const MotionSection = ({
       whileInView="visible"
       viewport={revealViewport}
       variants={chosenVariant}
-      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
       {...rest}
     >

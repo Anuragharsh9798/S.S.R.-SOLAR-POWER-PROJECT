@@ -11,12 +11,18 @@ import { RolesGuard } from './guards/roles.guard';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      useFactory: () => ({
-        secret: process.env.JWT_SECRET || 'ssr_solar_super_secret_jwt_key_2026',
-        signOptions: {
-          expiresIn: (process.env.JWT_EXPIRES_IN || '1d') as any,
-        },
-      }),
+      useFactory: () => {
+        const secret = process.env.JWT_SECRET;
+        if (!secret || secret.trim().length === 0) {
+          throw new Error('JWT_SECRET environment variable is missing or invalid. Application startup aborted.');
+        }
+        return {
+          secret,
+          signOptions: {
+            expiresIn: (process.env.JWT_EXPIRES_IN || '1d') as any,
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthController],

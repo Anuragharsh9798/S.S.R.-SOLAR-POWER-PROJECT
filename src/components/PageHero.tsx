@@ -10,6 +10,7 @@ interface PageHeroProps {
   image?: string;
   children?: ReactNode;
   rightContent?: ReactNode;
+  className?: string;
 }
 
 export const PageHero = ({
@@ -19,12 +20,13 @@ export const PageHero = ({
   image = "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=1920&q=80",
   children,
   rightContent,
+  className = "",
 }: PageHeroProps) => {
   const { pathname } = useLocation();
   const crumbs = pathname.split("/").filter(Boolean);
 
   return (
-    <section className="relative overflow-hidden pb-16 pt-32 md:pb-24 md:pt-40">
+    <section className={`relative overflow-hidden pb-16 pt-32 md:pb-24 md:pt-40 ${className}`}>
       <img
         src={image}
         alt=""

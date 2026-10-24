@@ -292,7 +292,9 @@ export const AdminDatabase = () => {
       try {
         const d = new Date(str);
         if (!isNaN(d.getTime())) return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-      } catch {}
+      } catch {
+        // Ignore date parsing error and fall back to raw string
+      }
     }
     return <span className="truncate max-w-[200px] inline-block font-medium">{str}</span>;
   };

@@ -323,57 +323,278 @@ export const SolarCalculator = ({ heading = true, className = "" }: { heading?: 
     }));
   }, [result.kw]);
 
+  const currentDateFormatted = useMemo(() => {
+    return new Date().toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }, []);
+
+  const referenceId = useMemo(() => {
+    const cityHash = city.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const code = Math.abs((cityHash * 31 + Math.round(bill || 6000)) % 1000000)
+      .toString(36)
+      .toUpperCase()
+      .padStart(5, "0");
+    return `SSR-EST-${code}`;
+  }, [city, bill]);
+
   return (
     <>
-      {/* Printable PDF Template (Visible ONLY during print/PDF export) */}
-      <div className="hidden print:block p-8 bg-white text-black font-sans space-y-6">
-        <div className="border-b-2 border-emerald-600 pb-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-emerald-700">SSR SOLAR POWER</h1>
-            <p className="text-xs text-gray-500">Official Solar Savings Calculation Summary</p>
-          </div>
-          <div className="text-right text-xs text-gray-600">
-            <p className="font-semibold">{city}, {state}</p>
-            <p>Tariff: ₹{rate}/unit · {roof}</p>
-          </div>
-        </div>
+      {/* =========================================================================
+          PROFESSIONAL SOLAR PROPOSAL PRINT DOCUMENT (A4 Portrait Print / PDF)
+          Visible ONLY during print/PDF export — Hidden on screen
+          ========================================================================= */}
+      <div className="hidden print:block solar-proposal-print-document w-full bg-white text-slate-900 font-sans p-0 m-0">
+        <div className="border border-slate-300 rounded-xl p-5 bg-white shadow-none space-y-3.5">
+          
+          {/* Header: Company Details & Proposal Meta */}
+          <div className="flex items-start justify-between border-b-2 border-emerald-600 pb-2.5 gap-4">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-extrabold tracking-tight text-emerald-800">SSR SOLAR POWER</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-300">
+                  MNRE Empanelled
+                </span>
+              </div>
+              <p className="text-xs font-semibold text-slate-700">Premium Solar Energy Solutions · Uttar Pradesh</p>
+              <p className="text-[10px] text-slate-500">
+                Kutubpur, Bahadurpur, Mau, Uttar Pradesh - 221602 · Phone: +91 83170 61340 · info@ssrsolarpower.com
+              </p>
+            </div>
 
-        <div className="space-y-3">
-          <h2 className="text-base font-bold text-gray-800 uppercase tracking-wide">Key Results Summary</h2>
-          <div className="grid grid-cols-2 gap-4 border rounded-xl p-5 bg-gray-50 text-sm">
-            <div className="border-r pr-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase">Recommended Plant Size</p>
-              <p className="text-xl font-bold text-emerald-700 mt-1">{result.kw.toFixed(2)} kW</p>
-            </div>
-            <div className="pl-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase">Required Roof Area</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">{result.requiredRoofArea.toFixed(2)} sq. ft.</p>
-              <p className="text-xs text-emerald-700 font-semibold mt-0.5">{result.requiredPanels} Panels × 530W</p>
-            </div>
-            <div className="border-r pr-4 border-t pt-3">
-              <p className="text-xs font-semibold text-gray-500 uppercase">Monthly Savings</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">₹ {result.monthlySavings.toLocaleString("en-IN")}</p>
-            </div>
-            <div className="pl-2 border-t pt-3">
-              <p className="text-xs font-semibold text-gray-500 uppercase">Annual Savings</p>
-              <p className="text-xl font-bold text-emerald-600 mt-1">₹ {result.annualSavings.toLocaleString("en-IN")}</p>
-            </div>
-            <div className="col-span-2 border-t pt-3">
-              <p className="text-xs font-semibold text-gray-500 uppercase">CO₂ Reduction</p>
-              <p className="text-xl font-bold text-emerald-700 mt-1">{result.co2Tonnes.toFixed(2)} Tonnes / year</p>
+            <div className="text-right shrink-0">
+              <div className="inline-block bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-right">
+                <p className="text-[9px] uppercase font-bold text-slate-500">Proposal Date</p>
+                <p className="text-xs font-bold text-slate-800">{currentDateFormatted}</p>
+                <p className="text-[9px] text-slate-400 font-mono mt-0.5">{referenceId}</p>
+              </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5 text-[10px] leading-relaxed text-gray-600">
+          {/* Title Banner */}
+          <div className="flex items-center justify-between bg-gradient-to-r from-emerald-50 via-slate-50 to-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2">
+            <div>
+              <h1 className="text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                Solar Savings Estimate
+              </h1>
+              <p className="text-[10px] text-slate-600">
+                Preliminary Feasibility & Financial Return Summary for Rooftop Solar
+              </p>
+            </div>
+            <div className="text-right">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-300">
+                📍 {city}, Uttar Pradesh
+              </span>
+            </div>
+          </div>
+
+          {/* SECTION A & SECTION B (2-Column Grid) */}
+          <div className="grid grid-cols-2 gap-3.5 proposal-section">
+            
+            {/* Section A — Customer & Site Details */}
+            <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 space-y-1.5">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+                <h2 className="text-[11px] font-bold uppercase tracking-wide text-emerald-900 flex items-center gap-1.5">
+                  Section A · Customer & Site Details
+                </h2>
+              </div>
+              <div className="text-[10.5px] space-y-1">
+                <div className="flex justify-between py-0.5 border-b border-slate-100">
+                  <span className="text-slate-500">Customer Name:</span>
+                  <span className="font-semibold text-slate-800">Not provided</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-slate-100">
+                  <span className="text-slate-500">Project Location:</span>
+                  <span className="font-semibold text-slate-800">{city}, {state}</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-slate-100">
+                  <span className="text-slate-500">Monthly Electricity Bill:</span>
+                  <span className="font-bold text-slate-900">₹{bill > 0 ? bill.toLocaleString("en-IN") : "Not provided"}</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-slate-100">
+                  <span className="text-slate-500">Monthly Consumption:</span>
+                  <span className="font-bold text-slate-900">{units > 0 ? `${units.toLocaleString("en-IN")} kWh` : "Not provided"}</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-slate-100">
+                  <span className="text-slate-500">Electricity Tariff:</span>
+                  <span className="font-semibold text-slate-800">₹{rate.toFixed(2)} / unit</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-slate-100">
+                  <span className="text-slate-500">Available Roof Area:</span>
+                  <span className="font-semibold text-slate-800">Not provided</span>
+                </div>
+                <div className="flex justify-between py-0.5">
+                  <span className="text-slate-500">Roof Surface Type:</span>
+                  <span className="font-semibold text-slate-800">{roof}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section B — Recommended Solar System */}
+            <div className="border border-emerald-200 rounded-xl p-3 bg-emerald-50/30 space-y-1.5">
+              <div className="flex items-center justify-between border-b border-emerald-200 pb-1">
+                <h2 className="text-[11px] font-bold uppercase tracking-wide text-emerald-900 flex items-center gap-1.5">
+                  Section B · Recommended Solar System
+                </h2>
+                <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                  {result.kw.toFixed(2)} kW Plant
+                </span>
+              </div>
+              <div className="text-[10.5px] space-y-1">
+                <div className="flex justify-between py-0.5 border-b border-emerald-100/60">
+                  <span className="text-slate-500">Recommended Plant Size:</span>
+                  <span className="font-bold text-emerald-800">{result.kw.toFixed(2)} kW</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-emerald-100/60">
+                  <span className="text-slate-500">Estimated Panels:</span>
+                  <span className="font-bold text-slate-900">{result.requiredPanels} Panels</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-emerald-100/60">
+                  <span className="text-slate-500">Panel Wattage & Tech:</span>
+                  <span className="font-semibold text-slate-800">530W Mono PERC / TOPCon</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-emerald-100/60">
+                  <span className="text-slate-500">Required Roof Area:</span>
+                  <span className="font-bold text-slate-900">{result.requiredRoofArea.toFixed(2)} sq. ft.</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-emerald-100/60">
+                  <span className="text-slate-500">Solar System Type:</span>
+                  <span className="font-semibold text-emerald-700">On-Grid (Grid-Tied) System</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-emerald-100/60">
+                  <span className="text-slate-500">Est. Daily Generation:</span>
+                  <span className="font-semibold text-slate-800">~{(result.kw * 4.5).toFixed(1)} kWh / day</span>
+                </div>
+                <div className="flex justify-between py-0.5">
+                  <span className="text-slate-500">Irradiance Assumption:</span>
+                  <span className="font-semibold text-slate-700">4.5 Peak Sun Hours/day in UP</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* SECTION C — Estimated Financial Benefits */}
+          <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/40 space-y-2 proposal-section">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+              <h2 className="text-[11px] font-bold uppercase tracking-wide text-slate-900 flex items-center gap-1.5">
+                Section C · Estimated Financial Benefits
+              </h2>
+              <span className="text-[9.5px] text-slate-500 italic">
+                Indicative estimates based on standard MNRE benchmarks & UP NEDA guidelines
+              </span>
+            </div>
+
+            {/* 3 Metric Highlight Pills */}
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="bg-white border border-slate-200 rounded-lg p-2 text-center shadow-none">
+                <p className="text-[9.5px] font-semibold text-slate-500 uppercase">Estimated Monthly Savings</p>
+                <p className="text-sm font-extrabold text-slate-900 mt-0.5">
+                  ₹{result.monthlySavings.toLocaleString("en-IN")}
+                </p>
+              </div>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center shadow-none">
+                <p className="text-[9.5px] font-semibold text-emerald-700 uppercase">Estimated Annual Savings</p>
+                <p className="text-sm font-extrabold text-emerald-700 mt-0.5">
+                  ₹{result.annualSavings.toLocaleString("en-IN")}
+                </p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-2 text-center shadow-none">
+                <p className="text-[9.5px] font-semibold text-slate-500 uppercase">Estimated Payback Period</p>
+                <p className="text-sm font-extrabold text-emerald-600 mt-0.5">
+                  ~{result.paybackPeriod} Years
+                </p>
+              </div>
+            </div>
+
+            {/* Financial Breakdown Table */}
+            <div className="border border-slate-200 rounded-lg overflow-hidden bg-white text-[10.5px]">
+              <table className="w-full text-left border-collapse">
+                <tbody>
+                  <tr className="border-b border-slate-100">
+                    <td className="py-1 px-3 font-medium text-slate-600">Estimated Turnkey System Cost (Benchmark ~₹55k/kW)</td>
+                    <td className="py-1 px-3 text-right font-semibold text-slate-900">₹{result.grossCost.toLocaleString("en-IN")}</td>
+                  </tr>
+                  <tr className="border-b border-slate-100 bg-emerald-50/40">
+                    <td className="py-1 px-3 text-emerald-800">
+                      Central Government Subsidy (PM Surya Ghar: Muft Bijli Yojana)
+                    </td>
+                    <td className="py-1 px-3 text-right font-semibold text-emerald-700">- ₹{result.centralSubsidy.toLocaleString("en-IN")}</td>
+                  </tr>
+                  <tr className="border-b border-slate-100 bg-emerald-50/40">
+                    <td className="py-1 px-3 text-emerald-800">
+                      Uttar Pradesh State Government Subsidy (UP NEDA)
+                    </td>
+                    <td className="py-1 px-3 text-right font-semibold text-emerald-700">- ₹{result.stateSubsidy.toLocaleString("en-IN")}</td>
+                  </tr>
+                  <tr className="border-b border-slate-100 bg-emerald-100/60 font-bold">
+                    <td className="py-1 px-3 text-emerald-900">Total Applicable Government Subsidy</td>
+                    <td className="py-1 px-3 text-right text-emerald-800">- ₹{result.totalSubsidy.toLocaleString("en-IN")}</td>
+                  </tr>
+                  <tr className="bg-slate-100/80 font-bold">
+                    <td className="py-1 px-3 text-slate-900">Estimated Net Cost After Subsidy</td>
+                    <td className="py-1 px-3 text-right text-slate-900 text-xs">₹{result.netCost.toLocaleString("en-IN")}</td>
+                  </tr>
+                  <tr className="border-t border-slate-200 bg-amber-50/40">
+                    <td className="py-1 px-3 text-slate-700 font-medium">Estimated 25-Year Cumulative Electricity Savings</td>
+                    <td className="py-1 px-3 text-right font-bold text-amber-700">₹{(result.annualSavings * 25).toLocaleString("en-IN")}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* SECTION D — Environmental Benefits */}
+          <div className="border border-emerald-200 rounded-xl p-2.5 bg-emerald-50/30 space-y-1 proposal-section">
+            <div className="flex items-center justify-between border-b border-emerald-200/80 pb-1">
+              <h2 className="text-[11px] font-bold uppercase tracking-wide text-emerald-900 flex items-center gap-1.5">
+                Section D · Environmental Benefits
+              </h2>
+              <span className="text-[9.5px] text-emerald-700 font-medium">CEA Baseline Grid Factor: 0.82 kg CO₂ / kWh</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2.5 text-center pt-0.5">
+              <div className="bg-white/90 border border-emerald-100 rounded-lg py-1 px-2">
+                <p className="text-[9px] font-semibold text-slate-500 uppercase">Annual CO₂ Reduction</p>
+                <p className="text-[11px] font-bold text-emerald-800 mt-0.5">{result.co2Tonnes.toFixed(2)} Tonnes / year</p>
+              </div>
+              <div className="bg-white/90 border border-emerald-100 rounded-lg py-1 px-2">
+                <p className="text-[9px] font-semibold text-slate-500 uppercase">Equivalent Trees Planted</p>
+                <p className="text-[11px] font-bold text-emerald-800 mt-0.5">~{Math.round(result.co2Tonnes * 45)} Trees / year</p>
+              </div>
+              <div className="bg-white/90 border border-emerald-100 rounded-lg py-1 px-2">
+                <p className="text-[9px] font-semibold text-slate-500 uppercase">25Y Lifetime Carbon Offset</p>
+                <p className="text-[11px] font-bold text-emerald-800 mt-0.5">~{(result.co2Tonnes * 25).toFixed(1)} Tonnes CO₂</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION E — Assumptions & Disclaimer */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-2 text-[9px] leading-relaxed text-slate-600 space-y-0.5 proposal-section">
+            <p className="font-bold text-slate-800 uppercase tracking-wider text-[9.5px]">
+              Section E · Assumptions & Disclaimer
+            </p>
             <p>
-              <strong>Disclaimer:</strong> All calculations shown are indicative estimates based on the information provided by the user, standard assumptions and current reference values. Actual solar generation, savings, system size, roof-area requirements, CO₂ reduction, electricity tariffs and final project costs may vary depending on site conditions, roof orientation, shading, system design, equipment specifications, local DISCOM regulations, weather and other factors. This calculator does not constitute a final quotation, engineering assessment or guaranteed savings. Please contact SSR Solar Power for a site survey and final proposal.
+              <strong>Assumptions:</strong> Calculations assume an average 4.5 peak sun hours/day in Uttar Pradesh, Tier-1 530W panels (~27.83 sq. ft./panel footprint), standard tilt mounting, and full net-metering energy offset at ₹{rate.toFixed(2)}/kWh.
+            </p>
+            <p>
+              <strong>Disclaimer:</strong> All figures shown are indicative estimates. Actual solar generation, savings, final turnkey installation cost, rooftop suitability, and government subsidy eligibility depend on site inspection, system design, equipment selection, weather, electricity tariff, and applicable DISCOM rules. This estimate does not constitute a final quotation or guarantee of savings. Contact SSR Solar Power for a site survey and formal proposal.
             </p>
           </div>
-        </div>
 
-        <div className="pt-8 border-t text-xs text-gray-500 text-center space-y-1">
-          <p className="font-semibold text-gray-700">SSR Solar Power · Mau, Uttar Pradesh</p>
-          <p>Contact: +91 8317061340 · Website: ssrsolarpower.com</p>
+          {/* Footer & Contact Bar */}
+          <div className="border-t border-slate-200 pt-1.5 flex items-center justify-between text-[9px] text-slate-500">
+            <div>
+              <span className="font-bold text-slate-700">SSR Solar Power</span> · Authorized Clean Energy Partner
+              <span className="mx-1.5">|</span>
+              Helpline: +91 83170 61340 · info@ssrsolarpower.com · ssrsolarpower.com
+            </div>
+            <div className="font-mono text-slate-400">
+              Page 1 of 1 · Ref: {referenceId}
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -728,7 +949,7 @@ export const SolarCalculator = ({ heading = true, className = "" }: { heading?: 
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.45 }}
-              className="w-full pt-4"
+              className="w-full pt-4 print:hidden"
             >
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 w-full">
                 {/* Chart 1: 10-Year Cumulative Savings */}

@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthService } from '../auth.service';
 
 export interface JwtPayload {
   sub: string;
@@ -12,7 +13,15 @@ export interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authService: AuthService,
+  ) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret || secret.trim().length === 0) {
+      throw new Error('JWT_SECRET environment variable is missing or invalid. Application startup aborted.');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
@@ -24,13 +33,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'ssr_solar_super_secret_jwt_key_2026',
+      secretOrKey: secret,
     });
   }
 
   async validate(payload: JwtPayload) {
     if (!payload || !payload.sub) {
-      throw new UnauthorizedException('Invalid token payload');
+      throw new UnauthorizedException('Invalid token payload: missing subject identifier');
     }
 
     let user: any = null;
@@ -41,27 +50,36 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         include: { role: true },
       });
     } catch {
-      // Fallback for offline DB execution
+      // Database lookup failure: MUST NOT grant access or synthesize user
+      throw new UnauthorizedException('Authentication verification failed: database lookup error');
     }
 
+    // In non-production testing environment, check in-memory verified test users
+    if (!user && process.env.NODE_ENV !== 'production' && this.authService) {
+      user = this.authService.findUserById(payload.sub);
+    }
+
+    // Token references a nonexistent user: MUST NOT synthesize a user or grant access
     if (!user) {
-      user = {
-        id: payload.sub,
-        email: payload.email,
-        isActive: true,
-        role: { name: payload.role },
-      };
+      throw new UnauthorizedException('User session invalid or user account does not exist');
     }
 
-    if (!user || user.isActive === false) {
-      throw new UnauthorizedException('User session invalid or user account deactivated');
+    // Disabled user: MUST NOT grant access
+    if (user.isActive === false) {
+      throw new UnauthorizedException('User account has been deactivated');
+    }
+
+    // Extract verified role strictly from user record; NEVER trust unverified token payload
+    const userRole = user.role?.name || user.roleName || (typeof user.role === 'string' ? user.role : null);
+    if (!userRole) {
+      throw new UnauthorizedException('User account does not have a valid assigned role');
     }
 
     return {
       id: user.id,
       email: user.email,
       fullName: user.fullName || user.email,
-      role: user.role?.name || user.role || payload.role,
+      role: userRole,
     };
   }
 }

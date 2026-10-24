@@ -878,7 +878,8 @@ export class ChatService {
       '• Free rooftop feasibility survey & customized plant design\n' +
       '• System maintenance, cleaning & health monitoring\n\n' +
       'Head Office Location:\n' +
-      'Kutubpur, Bahadurpur, Mau, Uttar Pradesh (Pincode: 221602)\n\n' +
+      'Kutubpur, Bahadurpur, Mau, Uttar Pradesh (Pincode: 221602)\n' +
+      'Email: info@ssrsolarpower.com\n\n' +
       'Pricing & Quotation:\n' +
       '• Benchmark rooftop solar pricing starts around ₹50,000 - ₹58,000 per kW (before subsidy), depending on structure height and inverter configuration.\n' +
       '• You can calculate your exact investment using our online Solar Calculator or request a free site inspection!\n\n' +

@@ -32,7 +32,11 @@ async function bootstrap() {
   app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   // 3. CORS Security & Origin Allowlist
-  const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:8080')
+  const defaultOrigins =
+    process.env.NODE_ENV === 'production'
+      ? 'https://ssrsolar.com,https://www.ssrsolar.com'
+      : 'http://localhost:8080';
+  const allowedOrigins = (process.env.CORS_ORIGIN || defaultOrigins)
     .split(',')
     .map((origin) => origin.trim());
 

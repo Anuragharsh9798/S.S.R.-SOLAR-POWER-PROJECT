@@ -104,7 +104,7 @@ export const AdminSettings: React.FC = () => {
       if (res && res.business) {
         setData(res);
         setCompanyName(res.business.companyName || 'SSR Solar Power');
-        setContactEmail(res.business.contactEmail || 'contact@ssrsolar.com');
+        setContactEmail(res.business.contactEmail || 'info@ssrsolarpower.com');
         setHotlinePhone(res.business.hotlinePhone || '+91 98765 43210');
         setOfficeAddress(res.business.officeAddress || '');
         setOperatingHours(res.business.operatingHours || '');
