@@ -30,6 +30,12 @@ interface GpsLocationData {
 
 interface QuotationResponse {
   quoteNumber?: string;
+  emailNotification?: {
+    sent: boolean;
+    status: 'sent' | 'failed' | 'skipped';
+    error?: string;
+    reason?: string;
+  };
   calculation?: {
     recommendedPlantSizeKw?: number;
     panelSpecs?: {
@@ -245,52 +251,65 @@ export const FreeQuoteModal = () => {
       setQuoteResponse(res);
       setSubmitted(true);
 
-      // 2. Dispatch EmailJS notification using quote reference
-      const submissionDate = new Date().toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Asia/Kolkata",
-      });
-
-      const emailResult = await sendQuoteEnquiryEmail({
-        client_name: formData.fullName.trim(),
-        client_phone: cleanPhone,
-        client_email: formData.email?.trim() || undefined,
-        complete_address: formData.address.trim(),
-        house_number: formData.houseNumber?.trim() || undefined,
-        area_locality: formData.area?.trim() || undefined,
-        city: formData.city?.trim() || "Mau",
-        district: formData.district?.trim() || undefined,
-        state: formData.state?.trim() || "Uttar Pradesh",
-        pincode: formData.pin?.trim() || undefined,
-        monthly_bill: formData.monthlyBill ? `₹${formData.monthlyBill}` : undefined,
-        solar_type: formData.solarType.trim() || "On-Grid Solar",
-        client_message: formData.message?.trim() || undefined,
-        quote_number: res?.quoteNumber || undefined,
-        submission_date: submissionDate,
-        google_maps_url: gpsLocation?.googleMapsUrl,
-      });
-
-      // 3. Handle EmailJS outcome without resubmitting quotation to backend
-      if (emailResult.success) {
+      // 2. Handle Admin Email Notification (Server-side priority prevents duplicate sends)
+      if (res?.emailNotification?.sent) {
         setEmailStatus("sent");
         toast.success("Quote request received successfully!", {
           description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
         });
-      } else if (emailResult.skipped) {
-        setEmailStatus("skipped");
-        toast.success("Quote request received successfully!", {
-          description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
-        });
-        if (import.meta.env.DEV) {
-          toast.error("EmailJS not configured. Please set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY in .env");
-        }
-      } else {
+      } else if (res?.emailNotification?.status === "failed") {
         setEmailStatus("failed");
         toast.success("Quote request received successfully!", {
           description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
         });
         toast.error("Quote was saved, but the email notification to our team could not be sent.");
+      } else {
+        // Fallback to client-side EmailJS if backend was skipped/unconfigured or legacy response
+        const submissionDate = new Date().toLocaleString("en-IN", {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "Asia/Kolkata",
+        });
+
+        const emailResult = await sendQuoteEnquiryEmail({
+          client_name: formData.fullName.trim(),
+          client_phone: cleanPhone,
+          client_email: formData.email?.trim() || undefined,
+          complete_address: formData.address.trim(),
+          house_number: formData.houseNumber?.trim() || undefined,
+          area_locality: formData.area?.trim() || undefined,
+          city: formData.city?.trim() || "Mau",
+          district: formData.district?.trim() || undefined,
+          state: formData.state?.trim() || "Uttar Pradesh",
+          pincode: formData.pin?.trim() || undefined,
+          monthly_bill: formData.monthlyBill ? `₹${formData.monthlyBill}` : undefined,
+          solar_type: formData.solarType.trim() || "On-Grid Solar",
+          client_message: formData.message?.trim() || undefined,
+          quote_number: res?.quoteNumber || undefined,
+          submission_date: submissionDate,
+          google_maps_url: gpsLocation?.googleMapsUrl,
+        });
+
+        if (emailResult.success) {
+          setEmailStatus("sent");
+          toast.success("Quote request received successfully!", {
+            description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+          });
+        } else if (emailResult.skipped) {
+          setEmailStatus("skipped");
+          toast.success("Quote request received successfully!", {
+            description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+          });
+          if (import.meta.env.DEV) {
+            toast.error("EmailJS not configured. Please set EMAILJS_SERVICE_ID in backend or VITE_EMAILJS_SERVICE_ID in frontend .env");
+          }
+        } else {
+          setEmailStatus("failed");
+          toast.success("Quote request received successfully!", {
+            description: `Reference Code: ${res?.quoteNumber || "SSR-2026"}`,
+          });
+          toast.error("Quote was saved, but the email notification to our team could not be sent.");
+        }
       }
 
       setTimeout(() => {

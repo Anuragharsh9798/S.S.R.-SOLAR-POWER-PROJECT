@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { CalculatorModule } from './calculator/calculator.module';
+import { MailModule } from './mail/mail.module';
 import { QuotationModule } from './quotation/quotation.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ReviewsModule } from './reviews/reviews.module';
@@ -46,6 +47,7 @@ const devControllers =
     AuditLogModule,
     AuthModule,
     CalculatorModule,
+    MailModule,
     QuotationModule,
     CustomerModule,
     ProjectsModule,

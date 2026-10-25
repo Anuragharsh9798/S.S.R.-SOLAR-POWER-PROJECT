@@ -15,4 +15,16 @@ export const envValidationSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().default('1d'),
   THROTTLE_TTL: Joi.number().default(60), // seconds
   THROTTLE_LIMIT: Joi.number().default(100), // requests per TTL
+  // Email notification configuration (EmailJS REST API)
+  EMAILJS_SERVICE_ID: Joi.string().optional().allow(''),
+  EMAILJS_TEMPLATE_ID: Joi.string().optional().allow(''),
+  EMAILJS_PUBLIC_KEY: Joi.string().optional().allow(''),
+  EMAILJS_PRIVATE_KEY: Joi.string().optional().allow(''),
+  EMAILJS_USER_ID: Joi.string().optional().allow(''),
+  EMAILJS_ACCESS_TOKEN: Joi.string().optional().allow(''),
+  ADMIN_NOTIFICATION_EMAIL: Joi.string().email().optional().allow(''),
+  // Aliases for compatibility with Vite env naming
+  VITE_EMAILJS_SERVICE_ID: Joi.string().optional().allow(''),
+  VITE_EMAILJS_TEMPLATE_ID: Joi.string().optional().allow(''),
+  VITE_EMAILJS_PUBLIC_KEY: Joi.string().optional().allow(''),
 });

@@ -455,4 +455,85 @@ describe("FreeQuoteModal - Quotation & EmailJS Notification Flow", () => {
       );
     });
   });
+
+  it("11. Server-side email notification (sent: true) marks status as sent and does NOT trigger client EmailJS (prevents duplicate sends)", async () => {
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({
+      quoteNumber: "SSR-SERVER-EMAIL-OK",
+      emailNotification: {
+        sent: true,
+        status: "sent",
+      },
+    });
+
+    const emailSpy = vi.spyOn(emailService, "sendQuoteEnquiryEmail");
+
+    render(<FreeQuoteModal />);
+
+    act(() => {
+      openFreeQuoteModal();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Request a Custom Solar Estimate")).toBeInTheDocument();
+    });
+
+    fillRequiredFields();
+
+    const submitBtn = screen.getByRole("button", { name: /Request Free Quote/i });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(postSpy).toHaveBeenCalledTimes(1);
+      expect(toast.success).toHaveBeenCalledWith(
+        "Quote request received successfully!",
+        expect.objectContaining({ description: "Reference Code: SSR-SERVER-EMAIL-OK" })
+      );
+    });
+
+    // Client-side EmailJS must NOT be called when backend already handled it
+    expect(emailSpy).not.toHaveBeenCalled();
+  });
+
+  it("12. Server-side email failure warns user that quote was saved but email failed without duplicate client calls", async () => {
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({
+      quoteNumber: "SSR-SERVER-EMAIL-FAIL",
+      emailNotification: {
+        sent: false,
+        status: "failed",
+        error: "SMTP connection refused",
+      },
+    });
+
+    const emailSpy = vi.spyOn(emailService, "sendQuoteEnquiryEmail");
+
+    render(<FreeQuoteModal />);
+
+    act(() => {
+      openFreeQuoteModal();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Request a Custom Solar Estimate")).toBeInTheDocument();
+    });
+
+    fillRequiredFields();
+
+    const submitBtn = screen.getByRole("button", { name: /Request Free Quote/i });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(postSpy).toHaveBeenCalledTimes(1);
+      expect(toast.success).toHaveBeenCalledWith(
+        "Quote request received successfully!",
+        expect.objectContaining({ description: "Reference Code: SSR-SERVER-EMAIL-FAIL" })
+      );
+      expect(toast.error).toHaveBeenCalledWith(
+        "Quote was saved, but the email notification to our team could not be sent."
+      );
+    });
+
+    // Client-side EmailJS must NOT be called
+    expect(emailSpy).not.toHaveBeenCalled();
+  });
 });
+

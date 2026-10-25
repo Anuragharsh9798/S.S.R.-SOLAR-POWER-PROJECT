@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CalculatorService } from '../calculator/calculator.service';
+import { MailService } from '../mail/mail.service';
 import { CreateQuotationDto } from './dto/create-quotation.dto';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class QuotationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly calculatorService: CalculatorService,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -98,6 +100,32 @@ export class QuotationService {
 
     this.logger.log(`New Solar Quotation generated: ${quoteNumber} for ${dto.fullName} (${dto.phone})`);
 
+    // 4. Send Admin Email Notification (Server-side, without blocking quotation creation on failure)
+    const submissionDate = new Date().toLocaleString('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: 'Asia/Kolkata',
+    });
+
+    const emailNotification = await this.mailService.sendQuoteEnquiryNotification({
+      quoteNumber,
+      fullName: dto.fullName,
+      phone: dto.phone,
+      email: dto.email,
+      address: dto.address,
+      houseNumber: dto.houseNumber,
+      area: dto.area,
+      city: dto.city || 'Mau',
+      district: dto.district,
+      state: dto.state || 'Uttar Pradesh',
+      pincode: dto.pincode,
+      monthlyBillAmount: dto.monthlyBillAmount,
+      solarType: dto.solarType || 'On-Grid Solar',
+      message: dto.message,
+      submissionDate,
+      googleMapsUrl: dto.googleMapsUrl,
+    });
+
     return {
       message: 'Quotation request received successfully',
       quoteNumber,
@@ -114,6 +142,7 @@ export class QuotationService {
       },
       calculation,
       createdAt: new Date().toISOString(),
+      emailNotification,
     };
   }
 
